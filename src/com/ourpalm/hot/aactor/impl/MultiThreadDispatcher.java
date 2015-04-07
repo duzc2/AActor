@@ -101,4 +101,14 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 		this.as = as;
 	}
 
+	@Override
+	public ActorRef findActor(Class<?> class1) {
+		return as.getConfigure().getActorBuilder().findActor(class1);
+	}
+
+	@Override
+	public ActorRef findActorById(String actorId) {
+		return as.getConfigure().getActorBuilder().findActorById(actorId);
+	}
+
 }

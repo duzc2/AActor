@@ -39,12 +39,12 @@ public class DefaultActorSystem implements ActorSystem {
 
 	@Override
 	public ActorRef findActor(Class<?> class1) {
-		return config.getActorBuilder().findActor(class1);
+		return config.getDispatcher().findActor(class1);
 	}
 
 	@Override
 	public ActorRef findActorById(String actorId) {
-		return config.getActorBuilder().findActorById(actorId);
+		return config.getDispatcher().findActorById(actorId);
 	}
 
 	@Override
@@ -59,13 +59,11 @@ public class DefaultActorSystem implements ActorSystem {
 
 	@Override
 	public ActorRef createActor(Class<?> clazz, Object... args) {
-		// config.getActorBuilder().buildActorRef(clazz, args);
 		return config.getDispatcher().createActor(clazz, args);
 	}
 
 	@Override
 	public void detachActor(ActorRef ref) {
-		// config.getActorBuilder().detachActor(ref);
 		config.getDispatcher().detachActor(ref);
 	}
 

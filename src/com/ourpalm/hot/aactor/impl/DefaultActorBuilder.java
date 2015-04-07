@@ -14,7 +14,6 @@ import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 
 /**
- * MessageContext ÎÞÐ§
  * 
  * @author g
  *

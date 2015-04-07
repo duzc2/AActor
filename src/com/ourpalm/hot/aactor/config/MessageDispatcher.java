@@ -16,4 +16,8 @@ public interface MessageDispatcher {
 
 	void init(ActorSystem as);
 
+	ActorRef findActor(Class<?> class1);
+
+	ActorRef findActorById(String actorId);
+
 }

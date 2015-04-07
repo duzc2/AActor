@@ -1,7 +1,10 @@
 package com.ourpalm.hot.aactor.impl;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
@@ -77,5 +80,21 @@ public class LocalActorRef implements ActorRef {
 			return false;
 		}
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T asType(Class<T> clazz) {
+		try {
+			InvocationHandler handler = new ActorInvocationHandler(this/*, clazz*/);
+			Class<?> proxyClass = Proxy.getProxyClass(clazz.getClassLoader(),
+					clazz);
+			Object newInstance = proxyClass.getConstructor(
+					InvocationHandler.class).newInstance(handler);
+			return (T) newInstance;
+		} catch (Exception e) {
+			throw new ActorException("can't make type proxy for type "
+					+ clazz.getCanonicalName(), e);
+		}
 	}
 }
