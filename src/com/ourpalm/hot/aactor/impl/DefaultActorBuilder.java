@@ -12,7 +12,6 @@ import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
-import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
 /**
  * MessageContext ÎÞÐ§
@@ -57,7 +56,7 @@ public class DefaultActorBuilder implements ActorBuilder {
 					+ root.getCanonicalName() + " with specified arguments.", e);
 		}
 		String id = "LocalActor-" + idgen.incrementAndGet();
-		ActorRef af = new LocalActorRef(id);
+		ActorRef af = new LocalActorRef(id, refMap, actorSystem);
 		try {
 			initActor(a, af);
 		} catch (Throwable t) {
@@ -86,83 +85,11 @@ public class DefaultActorBuilder implements ActorBuilder {
 		return (ActorRef) refMap.get(key);
 	}
 
-	public class LocalActorRef implements ActorRef {
-
-		private String id;
-
-		public LocalActorRef(String id) {
-			this.id = id;
-		}
-
-		@Override
-		public void sendMessage(String command, Object... arg) {
-			Object a = refMap.get(id);
-			if (a == null) {
-				throw new NullPointerException("can't find actor with id:" + id);
-			}
-			try {
-				sendMessage_(a, command, arg);
-			} catch (Throwable t) {
-				onError(a, t, command, arg);
-			}
-
-		}
-
-		private void onError(Object a, Throwable t, String command, Object[] arg) {
-			throw new RuntimeException(t);
-		}
-
-		private void sendMessage_(Object a, String command, Object[] arg)
-				throws Exception {
-			MessageDispatcher dispatcher = actorSystem.getConfigure()
-					.getDispatcher();
-			dispatcher.sendMessage(this, a, command, arg);
-		}
-
-		@Override
-		public String toString() {
-			return this.id;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((id == null) ? 0 : id.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			LocalActorRef other = (LocalActorRef) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (id == null) {
-				if (other.id != null)
-					return false;
-			} else if (!id.equals(other.id))
-				return false;
-			return true;
-		}
-
-		private DefaultActorBuilder getOuterType() {
-			return DefaultActorBuilder.this;
-		}
-
-	}
-
 	@Override
 	public ActorRef findActor(Class<?> class1) {
 		for (Entry<String, Object> e : refMap.entrySet()) {
 			if (class1.isInstance(e.getValue())) {
-				return new LocalActorRef(e.getKey());
+				return new LocalActorRef(e.getKey(), refMap, actorSystem);
 			}
 		}
 		return null;
@@ -170,7 +97,7 @@ public class DefaultActorBuilder implements ActorBuilder {
 
 	@Override
 	public ActorRef findActorById(String actorId) {
-		return new LocalActorRef(actorId);
+		return new LocalActorRef(actorId, refMap, actorSystem);
 	}
 
 	@Override
