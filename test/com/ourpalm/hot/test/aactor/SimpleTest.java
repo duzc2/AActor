@@ -1,20 +1,26 @@
 package com.ourpalm.hot.test.aactor;
 
+import java.util.concurrent.locks.LockSupport;
+
 import com.ourpalm.hot.aactor.Activate;
 import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
 @Actor
 public class SimpleTest {
 
-	public static void main(String[] args) {
-		ActorSystem actorSystem = new ActorSystemBuilder().build();
-		actorSystem.start(SimpleTest.class, null);
+	public static void main(String[] args) throws InterruptedException {
+		ActorSystem actorSystem = new ActorSystemBuilder()
+				.setMessageDispatcher(new MultiThreadDispatcher()).build();
+		actorSystem.start(SimpleTest.class);
 		ActorRef actor = actorSystem.findActor(SimpleTest.class);
 		actor.sendMessage("onMessage", "a message");
+		Thread.sleep(2000);
+		actorSystem.stop();
 	}
 
 	private ActorRef thisRef;
@@ -34,7 +40,8 @@ public class SimpleTest {
 		this.anotherActor = actorSystem.createActor(AnotherActor.class, 7);
 		anotherActor.sendMessage("abc");
 		thisRef.sendMessage("anotherHandler", 8);
-		actorSystem.stop();
+		LockSupport.parkNanos(1000/* s */ * 1000/* m */ * 1000 /* n */);
+		anotherActor.sendMessage("print","a message");
 	}
 
 	@Mailbox("anotherHandler")
@@ -71,6 +78,11 @@ public class SimpleTest {
 		@Mailbox
 		private void abc() {
 			System.out.println(thisRef.toString() + " a=" + a);
+		}
+
+		@Mailbox
+		private void print(String msg) {
+			System.out.println(thisRef.toString() + " print:" + msg);
 		}
 	}
 }

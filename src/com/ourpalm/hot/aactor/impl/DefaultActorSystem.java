@@ -11,9 +11,13 @@ public class DefaultActorSystem implements ActorSystem {
 	private ActorSystemConfigure config;
 	private ActorRef rootActor;
 
+	public DefaultActorSystem(ActorSystemConfigure config) {
+		config = config != null ? config : ConfigureLoader.loadConfigure();
+		this.config = config;
+	}
+
 	@Override
-	public void start(Class<?> root, ActorSystemConfigure config,
-			Object... args) {
+	public void start(Class<?> root, Object... args) {
 		if (root == null) {
 			throw new NullPointerException("root actor class is null");
 		}
@@ -22,12 +26,10 @@ public class DefaultActorSystem implements ActorSystem {
 			throw new java.lang.IllegalArgumentException(
 					"Specified root actor class is not a Actor");
 		}
-		config = config != null ? config : ConfigureLoader.loadConfigure();
-		this.config = config;
 		ActorBuilder actorBuilder = config.getActorBuilder();
 		actorBuilder.init(this);
 		config.getDispatcher().init(this);
-		this.rootActor = actorBuilder.buildActorRef(root, args);
+		this.rootActor = createActor(root, args);
 	}
 
 	@Override
