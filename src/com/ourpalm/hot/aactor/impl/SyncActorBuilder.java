@@ -3,18 +3,15 @@ package com.ourpalm.hot.aactor.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.esotericsoftware.reflectasm.ConstructorAccess;
+import com.ourpalm.hot.aactor.Activate;
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
-import com.ourpalm.hot.aactor.Activate;
-import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
@@ -67,7 +64,7 @@ public class SyncActorBuilder implements ActorBuilder {
 		} catch (Throwable t) {
 			throw new ActorException("Can't initialize actor:", t);
 		}
-		refMap.put(af.getId(), a);
+		refMap.put(af.toString(), a);
 		return af;
 	}
 
@@ -125,7 +122,7 @@ public class SyncActorBuilder implements ActorBuilder {
 		}
 
 		@Override
-		public String getId() {
+		public String toString() {
 			return this.id;
 		}
 
@@ -153,7 +150,7 @@ public class SyncActorBuilder implements ActorBuilder {
 
 	@Override
 	public void detachActor(ActorRef ref) {
-		this.refMap.remove(ref.getId());
+		this.refMap.remove(ref.toString());
 	}
 
 }

@@ -38,7 +38,7 @@ public class SimpleTest {
 
 	@Mailbox("anotherHandler")
 	public void anotherHandler(int i) {
-		System.out.println(thisRef.getId() + " anotherHandler:" + i);
+		System.out.println(thisRef.toString() + " anotherHandler:" + i);
 	}
 
 	@Mailbox("error")
@@ -69,7 +69,7 @@ public class SimpleTest {
 
 		@Mailbox
 		private void abc() {
-			System.out.println(thisRef.getId() + " a=" + a);
+			System.out.println(thisRef.toString() + " a=" + a);
 		}
 	}
 }

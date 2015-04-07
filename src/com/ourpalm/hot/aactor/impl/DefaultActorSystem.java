@@ -26,13 +26,13 @@ public class DefaultActorSystem implements ActorSystem {
 		this.config = config;
 		ActorBuilder actorBuilder = config.getActorBuilder();
 		actorBuilder.init(this);
+		config.getDispatcher().init(this);
 		this.rootActor = actorBuilder.buildActorRef(root, args);
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-
+		config.getDispatcher().close();
 	}
 
 	@Override
@@ -57,12 +57,14 @@ public class DefaultActorSystem implements ActorSystem {
 
 	@Override
 	public ActorRef createActor(Class<?> clazz, Object... args) {
-		return config.getActorBuilder().buildActorRef(clazz, args);
+		// config.getActorBuilder().buildActorRef(clazz, args);
+		return config.getDispatcher().createActor(clazz, args);
 	}
 
 	@Override
 	public void detachActor(ActorRef ref) {
-		config.getActorBuilder().detachActor(ref);
+		// config.getActorBuilder().detachActor(ref);
+		config.getDispatcher().detachActor(ref);
 	}
 
 }

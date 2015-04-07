@@ -1,4 +1,4 @@
-package com.ourpalm.hot.aactor.config;
+package com.ourpalm.hot.aactor.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,11 +7,14 @@ import java.util.WeakHashMap;
 
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
+import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
 public class SingleThreadMessageDispatcher implements MessageDispatcher {
 
 	private WeakHashMap<Object, HashMap<String, Method>> mailboxMap = new WeakHashMap<>();
+	private ActorSystem as;
 
 	@Override
 	public void sendMessage(ActorRef ar, Object a, String command, Object[] arg)
@@ -39,9 +42,32 @@ public class SingleThreadMessageDispatcher implements MessageDispatcher {
 		Method m = mailboxCache.get(command);
 		if (m == null) {
 			throw new ActorException("can't find mailbox " + command
-					+ " on Actor:" + ar.getId() + " from class:" + a.getClass());
+					+ " on Actor:" + ar.toString() + " from class:"
+					+ a.getClass());
 		}
 		m.invoke(a, arg);
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public ActorRef createActor(Class<?> clazz, Object[] args) {
+		// TODO Auto-generated method stub
+		return as.getConfigure().getActorBuilder().buildActorRef(clazz, args);
+	}
+
+	@Override
+	public void detachActor(ActorRef ref) {
+		as.getConfigure().getActorBuilder().detachActor(ref);
+	}
+
+	@Override
+	public void init(ActorSystem as) {
+		this.as = as;
 	}
 
 }

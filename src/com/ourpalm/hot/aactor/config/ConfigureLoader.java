@@ -1,5 +1,6 @@
 package com.ourpalm.hot.aactor.config;
 
+import com.ourpalm.hot.aactor.impl.SingleThreadMessageDispatcher;
 import com.ourpalm.hot.aactor.impl.SyncActorBuilder;
 
 public class ConfigureLoader {
