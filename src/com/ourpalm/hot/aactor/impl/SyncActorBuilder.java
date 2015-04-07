@@ -3,7 +3,6 @@ package com.ourpalm.hot.aactor.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -89,7 +88,6 @@ public class SyncActorBuilder implements ActorBuilder {
 	public class LocalActorRef implements ActorRef {
 
 		private String id;
-		private transient Map<String, Method> mailboxCache;
 
 		public LocalActorRef(String id) {
 			this.id = id;
