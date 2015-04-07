@@ -112,8 +112,7 @@ public class SyncActorBuilder implements ActorBuilder {
 		}
 
 		private void sendMessage_(Object a, String command, Object[] arg)
-				throws IllegalAccessException, IllegalArgumentException,
-				InvocationTargetException {
+				throws Exception {
 			MessageDispatcher dispatcher = actorSystem.getConfigure()
 					.getDispatcher();
 			dispatcher.sendMessage(this, a, command, arg);

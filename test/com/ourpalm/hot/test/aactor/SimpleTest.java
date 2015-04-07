@@ -1,10 +1,10 @@
 package com.ourpalm.hot.test.aactor;
 
-import com.ourpalm.hot.aactor.Actor;
-import com.ourpalm.hot.aactor.ActorSystem;
-import com.ourpalm.hot.aactor.ActorRef;
-import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Activate;
+import com.ourpalm.hot.aactor.Actor;
+import com.ourpalm.hot.aactor.ActorRef;
+import com.ourpalm.hot.aactor.ActorSystem;
+import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Mailbox;
 
 @Actor
@@ -31,9 +31,10 @@ public class SimpleTest {
 	@Mailbox
 	public void onMessage(String message) {
 		System.out.println("onMessage:" + message);
-		this.anotherActor = actorSystem.createActor(AnotherActor.class,7);
+		this.anotherActor = actorSystem.createActor(AnotherActor.class, 7);
 		anotherActor.sendMessage("abc");
 		thisRef.sendMessage("anotherHandler", 8);
+		actorSystem.stop();
 	}
 
 	@Mailbox("anotherHandler")
