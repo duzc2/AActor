@@ -68,7 +68,14 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 				if (mailboxCache.containsKey(name)) {
 					throw new ActorException("Duplicated Mailbox " + name);
 				}
-				mailboxCache.put(name, method);
+				Class<?> returnType = method.getReturnType();
+				if (returnType == Void.class || returnType == void.class) {
+					mailboxCache.put(name, method);
+				} else {
+					throw new ActorException(
+							"Mailbox return type must be void or Future:"
+									+ name);
+				}
 			}
 		}
 
