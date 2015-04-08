@@ -21,7 +21,7 @@ import com.ourpalm.hot.aactor.config.ActorBuilder;
 public class DefaultActorBuilder implements ActorBuilder {
 
 	private AtomicLong idgen = new AtomicLong();
-	private ConcurrentHashMap<String, Object> refMap = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, LocalSelfRef> refMap = new ConcurrentHashMap<>();
 	private ActorSystem actorSystem;
 
 	@Override
@@ -55,17 +55,17 @@ public class DefaultActorBuilder implements ActorBuilder {
 					+ root.getCanonicalName() + " with specified arguments.", e);
 		}
 		String id = "LocalActor-" + idgen.incrementAndGet();
-		ActorRef af = new LocalActorRef(id, refMap, actorSystem);
+		LocalSelfRef af = new LocalSelfRef(a, id, refMap, actorSystem);
 		try {
 			initActor(a, af);
 		} catch (Throwable t) {
 			throw new ActorException("Can't initialize actor:", t);
 		}
-		refMap.put(af.toString(), a);
+		refMap.put(af.toString(), af);
 		return af;
 	}
 
-	private void initActor(Object a, ActorRef af)
+	private void initActor(Object a, LocalSelfRef af)
 			throws IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 		Class<?> ac = a.getClass();
@@ -86,8 +86,8 @@ public class DefaultActorBuilder implements ActorBuilder {
 
 	@Override
 	public ActorRef findActor(Class<?> class1) {
-		for (Entry<String, Object> e : refMap.entrySet()) {
-			if (class1.isInstance(e.getValue())) {
+		for (Entry<String, LocalSelfRef> e : refMap.entrySet()) {
+			if (class1.isInstance(e.getValue().getObj())) {
 				return new LocalActorRef(e.getKey(), refMap, actorSystem);
 			}
 		}

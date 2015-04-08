@@ -12,6 +12,7 @@ import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
 public class SingleThreadDispatcher implements MessageDispatcher {
@@ -37,7 +38,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 			});
 
 	@Override
-	public void sendMessage(ActorRef ar, Object a, String command, Object[] arg)
+	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception {
 
 		executor.submit(new Runnable() {
@@ -54,10 +55,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 					}
 					m.invoke(a, arg);
 				} catch (Exception e) {
-					ActorException ae = new ActorException(
-							"Invoke fail. mailbox:" + command, e);
-					ae.printStackTrace();
-					throw ae;
+					ar.error(e, command, arg);
 				}
 			}
 		});

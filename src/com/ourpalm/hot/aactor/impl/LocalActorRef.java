@@ -7,15 +7,14 @@ import java.util.Map;
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
-import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
 public class LocalActorRef implements ActorRef {
 
-	private String id;
-	private Map<String, Object> refMap;
-	private ActorSystem actorSystem;
+	protected final String id;
+	protected final Map<String, LocalSelfRef> refMap;
+	protected final ActorSystem actorSystem;
 
-	public LocalActorRef(String id, Map<String, Object> refMap,
+	public LocalActorRef(String id, Map<String, LocalSelfRef> refMap,
 			ActorSystem actorSystem) {
 		this.id = id;
 		this.refMap = refMap;
@@ -24,27 +23,12 @@ public class LocalActorRef implements ActorRef {
 
 	@Override
 	public void sendMessage(String command, Object... arg) {
-		Object a = refMap.get(id);
+		LocalSelfRef a = refMap.get(id);
 		if (a == null) {
-			throw new NullPointerException("can't find actor with id:" + id);
+			throw new ActorException("can't find actor with id:" + id);
 		}
-		try {
-			sendMessage_(a, command, arg);
-		} catch (Throwable t) {
-			onError(a, t, command, arg);
-		}
+		a.sendMessage(command, arg);
 
-	}
-
-	private void onError(Object a, Throwable t, String command, Object[] arg) {
-		throw new RuntimeException(t);
-	}
-
-	private void sendMessage_(Object a, String command, Object[] arg)
-			throws Exception {
-		MessageDispatcher dispatcher = actorSystem.getConfigure()
-				.getDispatcher();
-		dispatcher.sendMessage(this, a, command, arg);
 	}
 
 	@Override
@@ -68,7 +52,7 @@ public class LocalActorRef implements ActorRef {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof LocalActorRef)) {
 			return false;
 		}
 		LocalActorRef other = (LocalActorRef) obj;
@@ -86,7 +70,7 @@ public class LocalActorRef implements ActorRef {
 	@Override
 	public <T> T asType(Class<T> clazz) {
 		try {
-			InvocationHandler handler = new ActorInvocationHandler(this/*, clazz*/);
+			InvocationHandler handler = new ActorInvocationHandler(this);
 			Class<?> proxyClass = Proxy.getProxyClass(clazz.getClassLoader(),
 					clazz);
 			Object newInstance = proxyClass.getConstructor(

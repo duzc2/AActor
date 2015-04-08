@@ -10,6 +10,7 @@ import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 import com.ourpalm.hot.aactor.impl.executor.OrderedExecutor;
 import com.ourpalm.hot.aactor.impl.executor.OrderedExecutors;
@@ -23,7 +24,7 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 	}
 
 	@Override
-	public void sendMessage(ActorRef ar, Object a, String command, Object[] arg)
+	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception {
 		excutor.execute(a, new Runnable() {
 
@@ -32,15 +33,14 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 				HashMap<String, Method> mailboxCache = mailboxMap.get(ar);
 				Method m = mailboxCache.get(command);
 				if (m == null) {
-					throw new ActorException("can't find mailbox " + command
-							+ " on Actor:" + ar.toString() + " from class:"
+					throw new ActorException("can't find mailbox \"" + command
+							+ "\" on Actor:" + ar.toString() + " from class:"
 							+ a.getClass());
 				}
 				try {
 					m.invoke(a, arg);
 				} catch (Exception e) {
-					throw new ActorException("Invoke fail. mailbox:" + command,
-							e);
+					ar.error(e, command, arg);
 				}
 			}
 		});

@@ -2,10 +2,11 @@ package com.ourpalm.hot.aactor.config;
 
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
+import com.ourpalm.hot.aactor.SelfRef;
 
 public interface MessageDispatcher {
 
-	void sendMessage(ActorRef ar, Object a, String command, Object[] arg)
+	void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception;
 
 	void close();

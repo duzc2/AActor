@@ -7,7 +7,10 @@ import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
+import com.ourpalm.hot.aactor.Context;
+import com.ourpalm.hot.aactor.ErrorHandler;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
 @Actor
@@ -23,13 +26,13 @@ public class SimpleTest {
 		actorSystem.stop();
 	}
 
-	private ActorRef thisRef;
+	private SelfRef selfRef;
 	private ActorSystem actorSystem;
 	private ActorRef anotherActor;
 
 	@Activate
-	public void init(ActorSystem system, ActorRef thisRef) {
-		this.thisRef = thisRef;
+	public void init(ActorSystem system, SelfRef thisRef) {
+		this.selfRef = thisRef;
 		this.actorSystem = system;
 		System.out.println("Instance of SimpleTest is created.");
 	}
@@ -39,19 +42,15 @@ public class SimpleTest {
 		System.out.println("onMessage:" + message);
 		this.anotherActor = actorSystem.createActor(AnotherActor.class, 7);
 		anotherActor.sendMessage("abc");
-		thisRef.sendMessage("anotherHandler", 8);
-		LockSupport.parkNanos(1000/* s */ * 1000/* m */ * 1000 /* n */);
-		anotherActor.sendMessage("print","a message");
+		selfRef.sendMessage("anotherHandler", 8);
+		anotherActor.sendMessage("error");
+		LockSupport.parkNanos(1000/* s */* 1000/* m */* 1000 /* n */);
+		anotherActor.sendMessage("print", "a message");
 	}
 
 	@Mailbox("anotherHandler")
 	public void anotherHandler(int i) {
-		System.out.println(thisRef.toString() + " anotherHandler:" + i);
-	}
-
-	@Mailbox("error")
-	public void onError(ActorRef caller, Throwable t) {
-		System.out.println("onError:" + t.getLocalizedMessage());
+		System.out.println(selfRef.toString() + " anotherHandler:" + i);
 	}
 
 	@Mailbox("tick")
@@ -61,7 +60,7 @@ public class SimpleTest {
 
 	@Actor
 	public static class AnotherActor {
-		private ActorRef thisRef;
+		private SelfRef thisRef;
 		private int a;
 
 		public AnotherActor(int a) {
@@ -69,10 +68,26 @@ public class SimpleTest {
 		}
 
 		@Activate
-		private void init(ActorSystem as, ActorRef thisRef) {
+		private void init(ActorSystem as, SelfRef thisRef) {
 			this.thisRef = thisRef;
 			System.out.println("Instance of AnotherActor is created with a="
 					+ a);
+			Context context = new Context();
+			context.setErrorHandler(new ErrorHandler() {
+
+				@Override
+				public void onError(Throwable t, String command, Object[] arg) {
+					t.printStackTrace(System.out);
+					System.out.println("Got a exception.");
+				}
+			});
+			thisRef.setContext(context);
+		}
+
+		@Mailbox("error")
+		public void error() {
+			System.out.println("error");
+			throw new NullPointerException("test error");
 		}
 
 		@Mailbox
