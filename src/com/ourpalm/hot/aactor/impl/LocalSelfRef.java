@@ -89,7 +89,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	}
 
 	@Override
-	public void call(String command, Object[] arg) {
+	public void call(String command, Object... arg) {
 		Method m = mailboxCache.get(command);
 		try {
 			if (m == null) {
@@ -106,7 +106,8 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				m.invoke(getObj(), arg);
 			}
 		} catch (Exception e) {
-			error(e, command, arg);
+			error(new ActorException("error on invoke method " + m.toString()
+					+ " on actor:" + toString(), e), command, arg);
 		}
 	}
 }

@@ -45,7 +45,7 @@ public class SimpleTest {
 		this.anotherActor = actorSystem.createActor(AnotherActor.class, 7);
 		anotherActor.sendMessage("abc");
 		selfRef.sendMessage("anotherHandler", 8);
-		anotherActor.sendMessage("error");
+		anotherActor.sendMessage("error", selfRef);
 		LockSupport.parkNanos(1000/* s */* 1000/* m */* 1000 /* n */);
 		anotherActor.sendMessage("print", "a message");
 		anotherActor.sendMessage("noMethod", "a default message handler");
@@ -56,10 +56,6 @@ public class SimpleTest {
 		System.out.println(selfRef.toString() + " anotherHandler:" + i);
 	}
 
-	@Mailbox("tick")
-	public void onTick(long deltaTime) {
-		System.out.println("onTick");
-	}
 
 	@Actor
 	public static class AnotherActor {
@@ -96,8 +92,10 @@ public class SimpleTest {
 		}
 
 		@Mailbox("error")
-		public void error() {
-			System.out.println("error");
+		public void error(ActorRef aref) {
+			System.out.println("error from " + aref);
+			aref.sendMessage("anotherHandler", 7);
+			aref.sendMessage("anotherHandler");
 			throw new NullPointerException("test error");
 		}
 
