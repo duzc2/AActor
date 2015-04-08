@@ -8,11 +8,9 @@ import com.ourpalm.hot.aactor.ActorRef;
 public class ActorInvocationHandler implements InvocationHandler {
 
 	private ActorRef actorRef;
-	//private Class<?> clazz;
 
-	public ActorInvocationHandler(ActorRef actorRef/*, Class<?> clazz*/) {
+	public ActorInvocationHandler(ActorRef actorRef) {
 		this.actorRef = actorRef;
-		//this.clazz = clazz;
 	}
 
 	@Override

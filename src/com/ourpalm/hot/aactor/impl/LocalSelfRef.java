@@ -91,13 +91,20 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	@Override
 	public void call(String command, Object[] arg) {
 		Method m = mailboxCache.get(command);
-		if (m == null) {
-			throw new ActorException("can't find mailbox \"" + command
-					+ "\" on Actor:" + toString() + " from class:"
-					+ getObj().getClass());
-		}
 		try {
-			m.invoke(getObj(), arg);
+			if (m == null) {
+				if (haveContext()
+						&& getContext().getDefaultMessageHandler() != null) {
+					getContext().getDefaultMessageHandler().onMessage(command,
+							arg);
+				} else {
+					throw new ActorException("can't find mailbox \"" + command
+							+ "\" on Actor:" + toString() + " from class:"
+							+ getObj().getClass());
+				}
+			} else {
+				m.invoke(getObj(), arg);
+			}
 		} catch (Exception e) {
 			error(e, command, arg);
 		}

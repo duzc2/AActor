@@ -2,7 +2,8 @@ package com.ourpalm.hot.aactor;
 
 public class Context {
 	private MessageFilter messageFilter;
-	private ErrorHandler eh;
+	private ErrorHandler errorHandler;
+	private DefaultMessageHandler DefaultMessageHandler;
 
 	public Context() {
 	}
@@ -18,11 +19,21 @@ public class Context {
 	public void setMessageFilter(MessageFilter messageFilter) {
 		this.messageFilter = messageFilter;
 	}
-	public void setErrorHandler(ErrorHandler eh){
-		this.eh = eh;
+
+	public void setErrorHandler(ErrorHandler eh) {
+		this.errorHandler = eh;
 	}
 
-	public ErrorHandler getErrorHandler(){
-		return eh;
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
+	}
+
+	public DefaultMessageHandler getDefaultMessageHandler() {
+		return DefaultMessageHandler;
+	}
+
+	public void setDefaultMessageHandler(
+			DefaultMessageHandler defaultMessageHandler) {
+		DefaultMessageHandler = defaultMessageHandler;
 	}
 }

@@ -1,5 +1,6 @@
 package com.ourpalm.hot.test.aactor;
 
+import java.util.Arrays;
 import java.util.concurrent.locks.LockSupport;
 
 import com.ourpalm.hot.aactor.Activate;
@@ -8,6 +9,7 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Context;
+import com.ourpalm.hot.aactor.DefaultMessageHandler;
 import com.ourpalm.hot.aactor.ErrorHandler;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
@@ -18,8 +20,7 @@ public class SimpleTest {
 
 	public static void main(String[] args) throws InterruptedException {
 		ActorSystem actorSystem = new ActorSystemBuilder()
-				.setMessageDispatcher(new MultiThreadDispatcher())
-		.build();
+				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		actorSystem.start(SimpleTest.class);
 		ActorRef actor = actorSystem.findActor(SimpleTest.class);
 		actor.sendMessage("onMessage", "a message");
@@ -47,6 +48,7 @@ public class SimpleTest {
 		anotherActor.sendMessage("error");
 		LockSupport.parkNanos(1000/* s */* 1000/* m */* 1000 /* n */);
 		anotherActor.sendMessage("print", "a message");
+		anotherActor.sendMessage("noMethod", "a default message handler");
 	}
 
 	@Mailbox("anotherHandler")
@@ -80,6 +82,14 @@ public class SimpleTest {
 				public void onError(Throwable t, String command, Object[] arg) {
 					t.printStackTrace(System.out);
 					System.out.println("Got a exception.");
+				}
+			});
+			context.setDefaultMessageHandler(new DefaultMessageHandler() {
+
+				@Override
+				public void onMessage(String command, Object[] arg) {
+					System.out.println("default message hander:" + command
+							+ " :" + Arrays.toString(arg));
 				}
 			});
 			thisRef.setContext(context);

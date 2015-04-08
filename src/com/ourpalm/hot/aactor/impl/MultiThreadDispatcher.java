@@ -12,8 +12,6 @@ import com.ourpalm.hot.aactor.impl.executor.OrderedExecutors;
 
 public class MultiThreadDispatcher implements MessageDispatcher {
 	private OrderedExecutor excutor;
-	// private ConcurrentHashMap<Object, HashMap<String, Method>> mailboxMap =
-	// new ConcurrentHashMap<>();
 	private ActorSystem as;
 
 	public MultiThreadDispatcher() {
@@ -40,14 +38,12 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 	public ActorRef createActor(Class<?> clazz, Object[] args) {
 		ActorRef ar = as.getConfigure().getActorBuilder()
 				.buildActorRef(clazz, args);
-		// mailboxMap.put(ar, mailboxCache);
 		return ar;
 	}
 
 	@Override
 	public void detachActor(ActorRef ref) {
 		as.getConfigure().getActorBuilder().detachActor(ref);
-		// mailboxMap.remove(ref);
 	}
 
 	@Override
