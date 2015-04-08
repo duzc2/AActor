@@ -45,18 +45,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 
 			@Override
 			public void run() {
-				try {
-					HashMap<String, Method> mailboxCache = mailboxMap.get(ar);
-					Method m = mailboxCache.get(command);
-					if (m == null) {
-						throw new ActorException("can't find mailbox "
-								+ command + " on Actor:" + ar.toString()
-								+ " from class:" + a.getClass());
-					}
-					m.invoke(a, arg);
-				} catch (Exception e) {
-					ar.error(e, command, arg);
-				}
+				ar.call(command, arg);
 			}
 		});
 	}

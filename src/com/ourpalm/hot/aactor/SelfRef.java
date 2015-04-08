@@ -7,4 +7,6 @@ public interface SelfRef extends ActorRef {
 	Context getContext();
 
 	void error(Throwable t, String command, Object[] arg);
+	
+	void call(String command, Object[] arg);
 }
