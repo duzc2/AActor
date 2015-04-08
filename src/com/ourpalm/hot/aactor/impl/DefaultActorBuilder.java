@@ -1,7 +1,6 @@
 package com.ourpalm.hot.aactor.impl;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +56,7 @@ public class DefaultActorBuilder implements ActorBuilder {
 		String id = "LocalActor-" + idgen.incrementAndGet();
 		LocalSelfRef af = new LocalSelfRef(a, id, refMap, actorSystem);
 		try {
-			initActor(a, af);
+			initActor(af);
 		} catch (Throwable t) {
 			throw new ActorException("Can't initialize actor:", t);
 		}
@@ -65,15 +64,13 @@ public class DefaultActorBuilder implements ActorBuilder {
 		return af;
 	}
 
-	private void initActor(Object a, LocalSelfRef af)
-			throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
-		Class<?> ac = a.getClass();
+	public void initActor(LocalSelfRef af) throws Exception {
+		Class<?> ac = af.getObj().getClass();
 		for (Method method : ac.getDeclaredMethods()) {
 			Activate init = method.getAnnotation(Activate.class);
 			if (init != null) {
 				method.setAccessible(true);
-				method.invoke(a, actorSystem, af);
+				method.invoke(af.getObj(), actorSystem, af);
 				break;
 			}
 		}

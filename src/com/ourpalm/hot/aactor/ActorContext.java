@@ -1,14 +1,14 @@
 package com.ourpalm.hot.aactor;
 
-public class Context {
+public class ActorContext {
 	private MessageFilter messageFilter;
 	private ErrorHandler errorHandler;
 	private DefaultMessageHandler DefaultMessageHandler;
 
-	public Context() {
+	public ActorContext() {
 	}
 
-	public Context(MessageFilter mf) {
+	public ActorContext(MessageFilter mf) {
 		this.messageFilter = mf;
 	}
 

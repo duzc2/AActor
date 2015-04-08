@@ -8,7 +8,7 @@ import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
-import com.ourpalm.hot.aactor.Context;
+import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.DefaultMessageHandler;
 import com.ourpalm.hot.aactor.ErrorHandler;
 import com.ourpalm.hot.aactor.Mailbox;
@@ -71,7 +71,7 @@ public class SimpleTest {
 			this.thisRef = thisRef;
 			System.out.println("Instance of AnotherActor is created with a="
 					+ a);
-			Context context = new Context();
+			ActorContext context = new ActorContext();
 			context.setErrorHandler(new ErrorHandler() {
 
 				@Override

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorSystem;
-import com.ourpalm.hot.aactor.Context;
+import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
@@ -14,7 +14,7 @@ import com.ourpalm.hot.aactor.config.MessageDispatcher;
 public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	private Object obj;
-	private Context context;
+	private ActorContext context;
 	private HashMap<String, Method> mailboxCache;
 
 	public LocalSelfRef(Object obj, String id,
@@ -51,12 +51,12 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	}
 
 	@Override
-	public void setContext(Context context) {
+	public void setContext(ActorContext context) {
 		this.context = context;
 	}
 
 	@Override
-	public Context getContext() {
+	public ActorContext getContext() {
 		return context;
 	}
 
