@@ -32,10 +32,13 @@ public class SimpleTest {
 		this.actorSystem = system;
 		anotherActor = actorSystem.createActor(AnotherActor.class);
 		anotherActor.sendMessage("a", 1);
+		anotherActor.sendMessage("b", 1);
 		anotherActor.sendMessage("stopA");
 		anotherActor.sendMessage("a", 2);
+		anotherActor.sendMessage("b", 2);
 		anotherActor.sendMessage("openA");
 		anotherActor.sendMessage("a", 3);
+		anotherActor.sendMessage("b", 3);
 	}
 
 	@Actor
@@ -50,6 +53,10 @@ public class SimpleTest {
 			this.thisRef = thisRef;
 		}
 
+		@Mailbox
+		public void b(int i) {
+			System.out.println("b:" + i);
+		}
 		@Mailbox
 		public void a(int i) {
 			System.out.println("a:" + i);
