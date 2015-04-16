@@ -62,10 +62,9 @@ public class MessageFilterTest {
 		@Mailbox
 		public void stopA() {
 			System.out.println("stopA");
-			thisRef.getContext().setMessageFilter(
-					(String title, Object[] message) -> {
-						return !"a".equals(title);
-					});
+			thisRef.getContext().setMessageFilter((title, message) -> {
+				return !"a".equals(title);
+			});
 		}
 
 		@Mailbox

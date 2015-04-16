@@ -68,11 +68,11 @@ public class SimpleTest {
 			System.out.println("Instance of AnotherActor is created with a="
 					+ a);
 			ActorContext context = new ActorContext();
-			context.setErrorHandler((Throwable t, String command, Object[] arg) -> {
+			context.setErrorHandler((t, command, arg) -> {
 				t.printStackTrace(System.out);
 				System.out.println("Got a exception.");
 			});
-			context.setDefaultMessageHandler((String command, Object[] arg) -> {
+			context.setDefaultMessageHandler((command, arg) -> {
 				System.out.println("default message hander:" + command + " :"
 						+ Arrays.toString(arg));
 			});
