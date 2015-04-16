@@ -1,11 +1,18 @@
 package com.ourpalm.hot.aactor;
 
+import java.util.LinkedList;
+
 public class ActorContext {
 	private MessageFilter messageFilter;
 	private ErrorHandler errorHandler;
 	private DefaultMessageHandler DefaultMessageHandler;
+	private LinkedList<Command> messageQueue = new LinkedList<>();
 
 	public ActorContext() {
+	}
+
+	public LinkedList<Command> getMessageQueue() {
+		return messageQueue;
 	}
 
 	public ActorContext(MessageFilter mf) {

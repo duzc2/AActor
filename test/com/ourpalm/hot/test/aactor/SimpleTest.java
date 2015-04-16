@@ -95,7 +95,7 @@ public class SimpleTest {
 		public void error(ActorRef aref) {
 			System.out.println("error from " + aref);
 			aref.sendMessage("anotherHandler", 7);
-			aref.sendMessage("anotherHandler");
+//			/aref.sendMessage("anotherHandler");
 			throw new NullPointerException("test error");
 		}
 

@@ -1,12 +1,15 @@
 package com.ourpalm.hot.aactor.impl;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
+import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorSystem;
-import com.ourpalm.hot.aactor.ActorContext;
+import com.ourpalm.hot.aactor.Command;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
@@ -103,11 +106,36 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 							+ getObj().getClass());
 				}
 			} else {
-				m.invoke(getObj(), arg);
+				// 如果消息不被接受，则加入列队
+				if (haveContext() && getContext().getMessageFilter() != null) {
+					if (!getContext().getMessageFilter().testMessage(command,
+							arg)) {
+						getContext().getMessageQueue().add(
+								new Command(command, arg));
+						return;
+					}
+				}
+				try {
+					m.invoke(getObj(), arg);
+				} catch (IllegalArgumentException e) {
+					error(e, command, arg);
+				}
+				reDeliver();
 			}
 		} catch (Exception e) {
 			error(new ActorException("error on invoke method " + m.toString()
 					+ " on actor:" + toString(), e), command, arg);
+		}
+	}
+
+	private void reDeliver() {
+		if (haveContext()) {
+			LinkedList<Command> messageQueue = getContext().getMessageQueue();
+			ArrayList<Command> newMessageQueue = new ArrayList<>(messageQueue);
+			messageQueue.clear();
+			for (Command command : newMessageQueue) {
+				call(command.getCommand(), command.getArgs());
+			}
 		}
 	}
 }
