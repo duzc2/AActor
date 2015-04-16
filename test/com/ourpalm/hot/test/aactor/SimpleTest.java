@@ -21,8 +21,7 @@ public class SimpleTest {
 	public static void main(String[] args) throws InterruptedException {
 		ActorSystem actorSystem = new ActorSystemBuilder()
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
-		actorSystem.start(SimpleTest.class);
-		ActorRef actor = actorSystem.findActor(SimpleTest.class);
+		ActorRef actor = actorSystem.start(SimpleTest.class);
 		actor.sendMessage("onMessage", "a message");
 		Thread.sleep(2000);
 		actorSystem.stop();

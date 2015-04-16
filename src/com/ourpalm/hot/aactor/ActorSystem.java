@@ -4,7 +4,7 @@ import com.ourpalm.hot.aactor.config.ActorSystemConfigure;
 
 public interface ActorSystem {
 
-	void start(Class<?> rootActor, Object... args);
+	ActorRef start(Class<?> rootActor, Object... args);
 
 	void stop();
 

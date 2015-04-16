@@ -17,18 +17,15 @@ public class MessageFilterTest {
 		ActorSystem actorSystem = new ActorSystemBuilder()
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		actorSystem.start(MessageFilterTest.class);
-		ActorRef actor = actorSystem.findActor(MessageFilterTest.class);
 		Thread.sleep(5000);
 		actorSystem.stop();
 	}
 
-	private SelfRef selfRef;
 	private ActorSystem actorSystem;
 	private ActorRef anotherActor;
 
 	@Activate
 	public void init(ActorSystem system, SelfRef thisRef) {
-		this.selfRef = thisRef;
 		this.actorSystem = system;
 		anotherActor = actorSystem.createActor(AnotherActor.class);
 		anotherActor.sendMessage("a", 1);

@@ -13,8 +13,7 @@ public class TypedTest implements ITypedTest {
 	public static void main(String[] args) throws InterruptedException {
 		ActorSystem actorSystem = new ActorSystemBuilder()
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
-		actorSystem.start(TypedTest.class);
-		ActorRef actor = actorSystem.findActor(TypedTest.class);
+		ActorRef actor = actorSystem.start(TypedTest.class);
 		ITypedTest typedTest = actor.asType(ITypedTest.class);
 		typedTest.foo("call from main");
 		Thread.sleep(2000);

@@ -17,7 +17,7 @@ public class DefaultActorSystem implements ActorSystem {
 	}
 
 	@Override
-	public void start(Class<?> root, Object... args) {
+	public ActorRef start(Class<?> root, Object... args) {
 		if (root == null) {
 			throw new NullPointerException("root actor class is null");
 		}
@@ -30,6 +30,7 @@ public class DefaultActorSystem implements ActorSystem {
 		actorBuilder.init(this);
 		config.getDispatcher().init(this);
 		this.rootActor = createActor(root, args);
+		return rootActor;
 	}
 
 	@Override
