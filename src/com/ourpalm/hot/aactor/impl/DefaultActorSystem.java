@@ -1,5 +1,9 @@
 package com.ourpalm.hot.aactor.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
@@ -10,6 +14,7 @@ import com.ourpalm.hot.aactor.config.ConfigureLoader;
 public class DefaultActorSystem implements ActorSystem {
 	private ActorSystemConfigure config;
 	private ActorRef rootActor;
+	private ConcurrentHashMap<String, ActorRef> registerMap = new ConcurrentHashMap<>();
 
 	public DefaultActorSystem(ActorSystemConfigure config) {
 		config = config != null ? config : ConfigureLoader.loadConfigure();
@@ -66,6 +71,26 @@ public class DefaultActorSystem implements ActorSystem {
 	@Override
 	public void detachActor(ActorRef ref) {
 		config.getDispatcher().detachActor(ref);
+	}
+
+	@Override
+	public void register(String name, ActorRef ref) {
+		this.registerMap.put(name, ref);
+	}
+
+	@Override
+	public void unregister(String name) {
+		this.registerMap.remove(name);
+	}
+
+	@Override
+	public ActorRef whereis(String name) {
+		return registerMap.get(name);
+	}
+
+	@Override
+	public Map<String, ActorRef> registered() {
+		return new HashMap<>(registerMap);
 	}
 
 }

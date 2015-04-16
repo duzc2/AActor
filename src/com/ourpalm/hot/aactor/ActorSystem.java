@@ -1,5 +1,7 @@
 package com.ourpalm.hot.aactor;
 
+import java.util.Map;
+
 import com.ourpalm.hot.aactor.config.ActorSystemConfigure;
 
 public interface ActorSystem {
@@ -19,4 +21,12 @@ public interface ActorSystem {
 	ActorRef createActor(Class<?> clazz, Object... args);
 
 	void detachActor(ActorRef ref);
+
+	void register(String name, ActorRef ref);
+
+	void unregister(String name);
+
+	ActorRef whereis(String name);
+
+	Map<String, ActorRef> registered();
 }
