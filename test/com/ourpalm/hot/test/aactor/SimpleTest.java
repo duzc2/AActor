@@ -5,12 +5,10 @@ import java.util.concurrent.locks.LockSupport;
 
 import com.ourpalm.hot.aactor.Activate;
 import com.ourpalm.hot.aactor.Actor;
+import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
-import com.ourpalm.hot.aactor.ActorContext;
-import com.ourpalm.hot.aactor.DefaultMessageHandler;
-import com.ourpalm.hot.aactor.ErrorHandler;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
@@ -55,7 +53,6 @@ public class SimpleTest {
 		System.out.println(selfRef.toString() + " anotherHandler:" + i);
 	}
 
-
 	@Actor
 	public static class AnotherActor {
 		private SelfRef thisRef;
@@ -71,21 +68,13 @@ public class SimpleTest {
 			System.out.println("Instance of AnotherActor is created with a="
 					+ a);
 			ActorContext context = new ActorContext();
-			context.setErrorHandler(new ErrorHandler() {
-
-				@Override
-				public void onError(Throwable t, String command, Object[] arg) {
-					t.printStackTrace(System.out);
-					System.out.println("Got a exception.");
-				}
+			context.setErrorHandler((Throwable t, String command, Object[] arg) -> {
+				t.printStackTrace(System.out);
+				System.out.println("Got a exception.");
 			});
-			context.setDefaultMessageHandler(new DefaultMessageHandler() {
-
-				@Override
-				public void onMessage(String command, Object[] arg) {
-					System.out.println("default message hander:" + command
-							+ " :" + Arrays.toString(arg));
-				}
+			context.setDefaultMessageHandler((String command, Object[] arg) -> {
+				System.out.println("default message hander:" + command + " :"
+						+ Arrays.toString(arg));
 			});
 			thisRef.setContext(context);
 		}
@@ -94,7 +83,7 @@ public class SimpleTest {
 		public void error(ActorRef aref) {
 			System.out.println("error from " + aref);
 			aref.sendMessage("anotherHandler", 7);
-//			/aref.sendMessage("anotherHandler");
+			// /aref.sendMessage("anotherHandler");
 			throw new NullPointerException("test error");
 		}
 

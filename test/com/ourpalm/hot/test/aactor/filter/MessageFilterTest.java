@@ -6,7 +6,6 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Mailbox;
-import com.ourpalm.hot.aactor.MessageFilter;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
@@ -54,6 +53,7 @@ public class MessageFilterTest {
 		public void b(int i) {
 			System.out.println("b:" + i);
 		}
+
 		@Mailbox
 		public void a(int i) {
 			System.out.println("a:" + i);
@@ -62,13 +62,10 @@ public class MessageFilterTest {
 		@Mailbox
 		public void stopA() {
 			System.out.println("stopA");
-			thisRef.getContext().setMessageFilter(new MessageFilter() {
-
-				@Override
-				public boolean testMessage(String title, Object[] message) {
-					return !"a".equals(title);
-				}
-			});
+			thisRef.getContext().setMessageFilter(
+					(String title, Object[] message) -> {
+						return !"a".equals(title);
+					});
 		}
 
 		@Mailbox
