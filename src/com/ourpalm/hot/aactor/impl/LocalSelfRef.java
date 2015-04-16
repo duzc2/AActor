@@ -2,6 +2,7 @@ package com.ourpalm.hot.aactor.impl;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,13 +12,14 @@ import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Command;
 import com.ourpalm.hot.aactor.Mailbox;
+import com.ourpalm.hot.aactor.MessageFilter;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 
 public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	private Object obj;
-	private ActorContext context;
+	private final ActorContext context = new ActorContext();;
 	private HashMap<String, Method> mailboxCache;
 
 	public LocalSelfRef(Object obj, String id,
@@ -54,17 +56,8 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	}
 
 	@Override
-	public void setContext(ActorContext context) {
-		this.context = context;
-	}
-
-	@Override
 	public ActorContext getContext() {
 		return context;
-	}
-
-	public boolean haveContext() {
-		return context != null;
 	}
 
 	@Override
@@ -78,11 +71,13 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	@Override
 	public void error(Throwable t, String command, Object[] arg) {
-		if (haveContext() && getContext().getErrorHandler() != null) {
-			getContext().getErrorHandler().onError(t, command, arg);
-		} else {
-			throw new RuntimeException(t);
-		}
+		context.getOptionalErrorHandler()
+				.orElseThrow(
+						() -> new RuntimeException(
+								"Except while handle command '" + command
+										+ "' on actor '" + getObj().toString()
+										+ "' with args:" + Arrays.toString(arg),
+								t)).onError(t, command, arg);
 	}
 
 	private void sendMessage_(String command, Object[] arg) throws Exception {
@@ -96,24 +91,19 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 		Method m = mailboxCache.get(command);
 		try {
 			if (m == null) {
-				if (haveContext()
-						&& getContext().getDefaultMessageHandler() != null) {
-					getContext().getDefaultMessageHandler().onMessage(command,
-							arg);
-				} else {
-					throw new ActorException("can't find mailbox \"" + command
-							+ "\" on Actor:" + toString() + " from class:"
-							+ getObj().getClass());
-				}
+				context.getOptionalDefaultMessageHandler().orElseThrow(
+						() -> new ActorException("can't find mailbox \""
+								+ command + "\" on Actor:" + toString()
+								+ " from class:" + getObj().getClass()));
 			} else {
 				// 如果消息不被接受，则加入列队
-				if (haveContext() && getContext().getMessageFilter() != null) {
-					if (!getContext().getMessageFilter().testMessage(command,
-							arg)) {
-						getContext().getMessageQueue().add(
-								new Command(command, arg));
-						return;
-					}
+				if (!context.getOptionalMessageFilter()
+						.orElse(MessageFilter.defaultMessageFilter)
+						.testMessage(command, arg)) {
+					getContext().getMessageQueue().add(
+							new Command(command, arg));
+					return;
+
 				}
 				try {
 					m.invoke(getObj(), arg);
@@ -129,13 +119,15 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	}
 
 	private void reDeliver() {
-		if (haveContext()) {
-			LinkedList<Command> messageQueue = getContext().getMessageQueue();
-			ArrayList<Command> newMessageQueue = new ArrayList<>(messageQueue);
-			messageQueue.clear();
-			for (Command command : newMessageQueue) {
-				call(command.getCommand(), command.getArgs());
-			}
+		LinkedList<Command> messageQueue = getContext().getMessageQueue();
+		if (messageQueue.isEmpty()) {
+			return;
+		}
+		ArrayList<Command> newMessageQueue = new ArrayList<>(messageQueue);
+		messageQueue.clear();
+		for (Command command : newMessageQueue) {
+			call(command.getCommand(), command.getArgs());
 		}
 	}
+
 }

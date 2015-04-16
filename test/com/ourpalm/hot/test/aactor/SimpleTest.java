@@ -67,7 +67,7 @@ public class SimpleTest {
 			this.thisRef = thisRef;
 			System.out.println("Instance of AnotherActor is created with a="
 					+ a);
-			ActorContext context = new ActorContext();
+			ActorContext context = thisRef.getContext();
 			context.setErrorHandler((t, command, arg) -> {
 				t.printStackTrace(System.out);
 				System.out.println("Got a exception.");
@@ -76,7 +76,6 @@ public class SimpleTest {
 				System.out.println("default message hander:" + command + " :"
 						+ Arrays.toString(arg));
 			});
-			thisRef.setContext(context);
 		}
 
 		@Mailbox("error")

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.ourpalm.hot.aactor.Activate;
-import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
@@ -56,7 +55,6 @@ public class DefaultActorBuilder implements ActorBuilder {
 		}
 		String id = "LocalActor-" + idgen.incrementAndGet();
 		LocalSelfRef af = new LocalSelfRef(a, id, refMap, actorSystem);
-		af.setContext(new ActorContext());
 		try {
 			initActor(af);
 		} catch (Throwable t) {
