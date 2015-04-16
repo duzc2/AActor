@@ -11,13 +11,13 @@ import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
 @Actor
-public class SimpleTest {
+public class MessageFilterTest {
 
 	public static void main(String[] args) throws InterruptedException {
 		ActorSystem actorSystem = new ActorSystemBuilder()
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
-		actorSystem.start(SimpleTest.class);
-		ActorRef actor = actorSystem.findActor(SimpleTest.class);
+		actorSystem.start(MessageFilterTest.class);
+		ActorRef actor = actorSystem.findActor(MessageFilterTest.class);
 		Thread.sleep(5000);
 		actorSystem.stop();
 	}
