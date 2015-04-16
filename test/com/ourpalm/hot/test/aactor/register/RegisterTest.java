@@ -17,6 +17,7 @@ public class RegisterTest {
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		actorSystem.start(RegisterTest.class);
 		ActorRef ar = actorSystem.whereis("test");
+		System.out.println(ar == null);
 		ar.sendMessage("a");
 		ar.sendMessage("a");
 		ar = actorSystem.whereis("test");
