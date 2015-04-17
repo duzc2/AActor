@@ -22,8 +22,8 @@ public class SimpleTest {
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		ActorRef actor = actorSystem.start(SimpleTest.class);
 		actor.sendMessage("onMessage", "a message");
-		actorSystem.detachActor(actor);
 		Thread.sleep(2000);
+		actorSystem.detachActor(actor);
 		Thread.sleep(2000);
 		actorSystem.stop();
 	}

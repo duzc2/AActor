@@ -105,6 +105,7 @@ public class DefaultActorBuilder implements ActorBuilder {
 	@Override
 	public void detachActor(ActorRef ref) {
 		LocalSelfRef self = this.refMap.remove(ref.toString());
+		self.setActive(false);
 		Object obj = self.getObj();
 		Method[] declaredMethods = obj.getClass().getDeclaredMethods();
 		for (Method method : declaredMethods) {

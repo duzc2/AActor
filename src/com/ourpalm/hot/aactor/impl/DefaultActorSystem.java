@@ -70,6 +70,9 @@ public class DefaultActorSystem implements ActorSystem {
 
 	@Override
 	public void detachActor(ActorRef ref) {
+		if (ref == null) {
+			return;
+		}
 		config.getDispatcher().detachActor(ref);
 	}
 

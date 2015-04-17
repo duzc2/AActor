@@ -21,6 +21,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	private Object obj;
 	private final ActorContext context = new ActorContext();;
 	private HashMap<String, Method> mailboxCache;
+	private boolean active = false;
 
 	public LocalSelfRef(Object obj, String id,
 			Map<String, LocalSelfRef> refMap, ActorSystem actorSystem) {
@@ -49,6 +50,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				}
 			}
 		}
+		setActive(true);
 	}
 
 	public Object getObj() {
@@ -88,6 +90,9 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	@Override
 	public void call(String command, Object... arg) {
+		if (!active) {
+			return;
+		}
 		Method m = mailboxCache.get(command);
 		try {
 			if (m == null) {
@@ -130,6 +135,10 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 		for (Command command : newMessageQueue) {
 			call(command.getCommand(), command.getArgs());
 		}
+	}
+
+	public void setActive(boolean b) {
+		this.active = b;
 	}
 
 }
