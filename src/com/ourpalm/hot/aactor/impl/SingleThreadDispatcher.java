@@ -4,6 +4,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
@@ -13,6 +14,7 @@ import com.ourpalm.hot.aactor.config.MessageDispatcher;
 public class SingleThreadDispatcher implements MessageDispatcher {
 
 	private ActorSystem as;
+	private AtomicLong queuedMessage = new AtomicLong();
 	private ExecutorService executor = Executors
 			.newSingleThreadExecutor(new ThreadFactory() {
 
@@ -35,6 +37,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception {
 
+		queuedMessage.incrementAndGet();
 		executor.submit(new Runnable() {
 
 			@Override
@@ -74,6 +77,16 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 	@Override
 	public ActorRef findActorById(String actorId) {
 		return as.getConfigure().getActorBuilder().findActorById(actorId);
+	}
+
+	@Override
+	public long queuedMessage() {
+		return queuedMessage.get();
+	}
+
+	@Override
+	public void decrementQueuedMessage() {
+		queuedMessage.decrementAndGet();
 	}
 
 }

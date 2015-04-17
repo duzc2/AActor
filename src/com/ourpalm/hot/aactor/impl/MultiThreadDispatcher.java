@@ -13,6 +13,7 @@ import com.ourpalm.hot.aactor.impl.executor.OrderedExecutors;
 public class MultiThreadDispatcher implements MessageDispatcher {
 	private OrderedExecutor excutor;
 	private ActorSystem as;
+	private AtomicLong queuedMessage = new AtomicLong();
 
 	public MultiThreadDispatcher() {
 	}
@@ -20,13 +21,8 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 	@Override
 	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception {
-		excutor.execute(a, new Runnable() {
-
-			@Override
-			public void run() {
-				ar.call(command, arg);
-			}
-		});
+		queuedMessage.incrementAndGet();
+		excutor.execute(a, () -> ar.call(command, arg));
 	}
 
 	@Override
@@ -75,4 +71,13 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 		return as.getConfigure().getActorBuilder().findActorById(actorId);
 	}
 
+	@Override
+	public long queuedMessage() {
+		return queuedMessage.get();
+	}
+
+	@Override
+	public void decrementQueuedMessage() {
+		queuedMessage.decrementAndGet();
+	}
 }

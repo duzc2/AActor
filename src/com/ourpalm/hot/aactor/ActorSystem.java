@@ -29,4 +29,6 @@ public interface ActorSystem {
 	ActorRef whereis(String name);
 
 	Map<String, ActorRef> registered();
+
+	long queuedMessage();
 }

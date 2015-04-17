@@ -106,6 +106,8 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 				}
 				try {
+					this.actorSystem.getConfigure().getDispatcher()
+							.decrementQueuedMessage();
 					m.invoke(getObj(), arg);
 				} catch (IllegalArgumentException e) {
 					error(e, command, arg);

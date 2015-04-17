@@ -9,6 +9,7 @@ import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
+import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
@@ -21,6 +22,8 @@ public class SimpleTest {
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		ActorRef actor = actorSystem.start(SimpleTest.class);
 		actor.sendMessage("onMessage", "a message");
+		actorSystem.detachActor(actor);
+		Thread.sleep(2000);
 		Thread.sleep(2000);
 		actorSystem.stop();
 	}
@@ -36,11 +39,24 @@ public class SimpleTest {
 		System.out.println("Instance of SimpleTest is created.");
 	}
 
+	@Deactivate
+	private void destory() {
+		actorSystem.detachActor(anotherActor);
+		System.out.println(selfRef.toString() + " destory");
+	}
+
 	@Mailbox
 	public void onMessage(String message) {
-		System.out.println("onMessage:" + message);
+		System.err.println("onMessage:" + message);
 		this.anotherActor = actorSystem.createActor(AnotherActor.class, 7);
 		anotherActor.sendMessage("abc");
+		anotherActor.sendMessage("abc");
+		anotherActor.sendMessage("abc");
+		anotherActor.sendMessage("abc");
+		anotherActor.sendMessage("abc");
+		selfRef.sendMessage("anotherHandler", 8);
+		selfRef.sendMessage("anotherHandler", 8);
+		selfRef.sendMessage("anotherHandler", 8);
 		selfRef.sendMessage("anotherHandler", 8);
 		anotherActor.sendMessage("error", selfRef);
 		LockSupport.parkNanos(1000/* s */* 1000/* m */* 1000 /* n */);
@@ -50,7 +66,7 @@ public class SimpleTest {
 
 	@Mailbox("anotherHandler")
 	public void anotherHandler(int i) {
-		System.out.println(selfRef.toString() + " anotherHandler:" + i);
+		System.err.println(selfRef.toString() + " anotherHandler:" + i);
 	}
 
 	@Actor
@@ -65,17 +81,22 @@ public class SimpleTest {
 		@Activate
 		private void init(ActorSystem as, SelfRef thisRef) {
 			this.thisRef = thisRef;
-			System.out.println("Instance of AnotherActor is created with a="
+			System.err.println("Instance of AnotherActor is created with a="
 					+ a);
 			ActorContext context = thisRef.getContext();
 			context.setErrorHandler((t, command, arg) -> {
 				t.printStackTrace(System.out);
-				System.out.println("Got a exception.");
+				System.err.println("Got a exception.");
 			});
 			context.setDefaultMessageHandler((command, arg) -> {
-				System.out.println("default message hander:" + command + " :"
+				System.err.println("default message hander:" + command + " :"
 						+ Arrays.toString(arg));
 			});
+		}
+
+		@Deactivate
+		private void destory() {
+			System.out.println(thisRef.toString() + " destory");
 		}
 
 		@Mailbox("error")
@@ -88,12 +109,12 @@ public class SimpleTest {
 
 		@Mailbox
 		private void abc() {
-			System.out.println(thisRef.toString() + " a=" + a);
+			System.err.println(thisRef.toString() + " a=" + a);
 		}
 
 		@Mailbox
 		private void print(String msg) {
-			System.out.println(thisRef.toString() + " print:" + msg);
+			System.err.println(thisRef.toString() + " print:" + msg);
 		}
 	}
 }

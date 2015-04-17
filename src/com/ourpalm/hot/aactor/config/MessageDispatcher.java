@@ -21,4 +21,7 @@ public interface MessageDispatcher {
 
 	ActorRef findActorById(String actorId);
 
+	long queuedMessage();
+
+	void decrementQueuedMessage();
 }

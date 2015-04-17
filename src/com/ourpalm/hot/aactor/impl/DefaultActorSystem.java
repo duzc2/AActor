@@ -93,4 +93,9 @@ public class DefaultActorSystem implements ActorSystem {
 		return new HashMap<>(registerMap);
 	}
 
+	@Override
+	public long queuedMessage() {
+		return getConfigure().getDispatcher().queuedMessage();
+	}
+
 }

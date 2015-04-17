@@ -10,6 +10,7 @@ import com.ourpalm.hot.aactor.Activate;
 import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
+import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 
 /**
@@ -103,7 +104,19 @@ public class DefaultActorBuilder implements ActorBuilder {
 
 	@Override
 	public void detachActor(ActorRef ref) {
-		this.refMap.remove(ref.toString());
+		LocalSelfRef self = this.refMap.remove(ref.toString());
+		Object obj = self.getObj();
+		Method[] declaredMethods = obj.getClass().getDeclaredMethods();
+		for (Method method : declaredMethods) {
+			if (method.isAnnotationPresent(Deactivate.class)) {
+				method.setAccessible(true);
+				try {
+					method.invoke(obj);
+				} catch (Exception e) {
+					self.error(e, "system.detach", null);
+				}
+			}
+		}
 	}
 
 }
