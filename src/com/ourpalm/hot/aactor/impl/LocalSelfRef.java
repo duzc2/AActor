@@ -86,15 +86,16 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 							() -> new RuntimeException(
 									"Except while handle command '" + command
 											+ "' on actor '"
-											+ getObj().toString()
+											+ toString()
 											+ "' with args:"
 											+ Arrays.toString(arg), t))
 					.onError(t, command, arg);
 		} catch (Throwable th) {
 			this.actorSystem.detachActor(this);
 			for (ActorRef ar : linked) {
-				ar.sendMessage(Exit.COMMAND, this);
+				ar.sendMessage(Exit.COMMAND, this, th.getLocalizedMessage(), th);
 			}
+			th.printStackTrace();
 		}
 	}
 
@@ -121,9 +122,9 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 												+ getObj().getClass()))
 						.onMessage(command, arg);
 			} catch (Throwable th) {
-				error(new ActorException("error on handle message: "
-						+ command + " by default message handler on actor:" + toString(), th),
-						command, arg);
+				error(new ActorException("error on handle message: " + command
+						+ " by default message handler on actor:" + toString(),
+						th), command, arg);
 			}
 		} else {
 			try {
@@ -184,5 +185,9 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	@Override
 	public void unlink(ActorRef ar) {
 		this.actorSystem.getConfigure().getDispatcher().unlink(this, ar);
+	}
+
+	public Set<ActorRef> getLinked() {
+		return linked;
 	}
 }

@@ -81,4 +81,8 @@ public class LocalActorRef implements ActorRef {
 					+ clazz.getCanonicalName(), e);
 		}
 	}
+
+	public ActorSystem getActorSystem() {
+		return actorSystem;
+	}
 }

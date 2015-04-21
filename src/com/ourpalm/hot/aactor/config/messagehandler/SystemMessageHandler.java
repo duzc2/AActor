@@ -15,6 +15,7 @@ public class SystemMessageHandler implements DefaultMessageHandler {
 		_handlers.put(Link.COMMAND, new Link());
 		_handlers.put(Unlink.COMMAND, new Unlink());
 		_handlers.put(Exit.COMMAND, new Exit());
+		_handlers.put(Kill.COMMAND, new Kill());
 		handlers = Collections.unmodifiableMap(_handlers);
 	}
 
