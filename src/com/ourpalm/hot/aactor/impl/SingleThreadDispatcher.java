@@ -10,6 +10,8 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
+import com.ourpalm.hot.aactor.config.messagehandler.Link;
+import com.ourpalm.hot.aactor.config.messagehandler.Unlink;
 
 public class SingleThreadDispatcher implements MessageDispatcher {
 
@@ -89,4 +91,15 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 		queuedMessage.decrementAndGet();
 	}
 
+	@Override
+	public void link(SelfRef self, ActorRef ar) {
+		self.sendMessage(Link.COMMAND, ar);
+		ar.sendMessage(Link.COMMAND, self);
+	}
+
+	@Override
+	public void unlink(SelfRef self, ActorRef ar) {
+		self.sendMessage(Unlink.COMMAND, ar);
+		ar.sendMessage(Unlink.COMMAND, self);
+	}
 }

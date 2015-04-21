@@ -24,4 +24,14 @@ public interface MessageDispatcher {
 	long queuedMessage();
 
 	void decrementQueuedMessage();
+
+//	ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object[] args);
+//
+	void link(SelfRef self, ActorRef ar);
+
+	void unlink(SelfRef self, ActorRef ar);
+
+//	void monitor(SelfRef self, ActorRef ar);
+//
+//	void unmonitor(SelfRef self, ActorRef ar);
 }

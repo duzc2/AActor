@@ -54,7 +54,8 @@ public class DefaultActorBuilder implements ActorBuilder {
 			throw new ActorException("Can't instance class "
 					+ root.getCanonicalName() + " with specified arguments.", e);
 		}
-		String id = "LocalActor-" + idgen.incrementAndGet();
+		String id = "LocalActor-" + idgen.incrementAndGet() + "["
+				+ root.getCanonicalName() + "]";
 		LocalSelfRef af = new LocalSelfRef(a, id, refMap, actorSystem);
 		try {
 			initActor(af);

@@ -12,13 +12,21 @@ public interface ActorSystem {
 
 	ActorRef findActor(Class<?> class1);
 
-	ActorRef findActorById(String actorId);
+	// ActorRef findActorById(String actorId);
 
 	ActorRef getRootActorRef();
 
 	ActorSystemConfigure getConfigure();
 
 	ActorRef createActor(Class<?> clazz, Object... args);
+
+	// ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object...
+	// args);
+	//
+
+	// void monitor(SelfRef self, ActorRef ar);
+	//
+	// void unmonitor(SelfRef self, ActorRef ar);
 
 	void detachActor(ActorRef ref);
 

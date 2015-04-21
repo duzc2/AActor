@@ -1,6 +1,5 @@
 package com.ourpalm.hot.aactor;
 
-
 public interface SelfRef extends ActorRef {
 
 	ActorContext getContext();
@@ -8,4 +7,8 @@ public interface SelfRef extends ActorRef {
 	void error(Throwable t, String command, Object[] arg);
 
 	void call(String command, Object... arg);
+
+	void link(ActorRef ar);
+
+	void unlink(ActorRef ar);
 }

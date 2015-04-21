@@ -49,11 +49,6 @@ public class DefaultActorSystem implements ActorSystem {
 	}
 
 	@Override
-	public ActorRef findActorById(String actorId) {
-		return config.getDispatcher().findActorById(actorId);
-	}
-
-	@Override
 	public ActorRef getRootActorRef() {
 		return rootActor;
 	}
@@ -100,5 +95,12 @@ public class DefaultActorSystem implements ActorSystem {
 	public long queuedMessage() {
 		return getConfigure().getDispatcher().queuedMessage();
 	}
+
+	// @Override
+	// public ActorRef createActorAndLink(SelfRef self, Class<?> clazz,
+	// Object... args) {
+	// return config.getDispatcher().createActorAndLink(self, clazz, args);
+	// }
+	//
 
 }

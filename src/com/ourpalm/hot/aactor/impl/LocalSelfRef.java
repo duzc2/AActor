@@ -4,22 +4,28 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorException;
+import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Command;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.MessageFilter;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
+import com.ourpalm.hot.aactor.config.messagehandler.Exit;
+import com.ourpalm.hot.aactor.config.messagehandler.SystemMessageHandler;
 
 public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	private Object obj;
-	private final ActorContext context = new ActorContext();;
+	private final ActorContext context = new ActorContext();
+	private final Set<ActorRef> linked = new HashSet<>();
 	private HashMap<String, Method> mailboxCache;
 	private boolean active = false;
 
@@ -50,6 +56,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				}
 			}
 		}
+		context.setDefaultMessageHandler(new SystemMessageHandler(this));
 		setActive(true);
 	}
 
@@ -73,13 +80,22 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	@Override
 	public void error(Throwable t, String command, Object[] arg) {
-		context.getOptionalErrorHandler()
-				.orElseThrow(
-						() -> new RuntimeException(
-								"Except while handle command '" + command
-										+ "' on actor '" + getObj().toString()
-										+ "' with args:" + Arrays.toString(arg),
-								t)).onError(t, command, arg);
+		try {
+			context.getOptionalErrorHandler()
+					.orElseThrow(
+							() -> new RuntimeException(
+									"Except while handle command '" + command
+											+ "' on actor '"
+											+ getObj().toString()
+											+ "' with args:"
+											+ Arrays.toString(arg), t))
+					.onError(t, command, arg);
+		} catch (Throwable th) {
+			this.actorSystem.detachActor(this);
+			for (ActorRef ar : linked) {
+				ar.sendMessage(Exit.COMMAND, this);
+			}
+		}
 	}
 
 	private void sendMessage_(String command, Object[] arg) throws Exception {
@@ -94,13 +110,23 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 			return;
 		}
 		Method m = mailboxCache.get(command);
-		try {
-			if (m == null) {
-				context.getOptionalDefaultMessageHandler().orElseThrow(
-						() -> new ActorException("can't find mailbox \""
-								+ command + "\" on Actor:" + toString()
-								+ " from class:" + getObj().getClass()));
-			} else {
+		if (m == null) {
+			try {
+				context.getOptionalDefaultMessageHandler()
+						.orElseThrow(
+								() -> new ActorException(
+										"can't find mailbox \"" + command
+												+ "\" on Actor:" + toString()
+												+ " from class:"
+												+ getObj().getClass()))
+						.onMessage(command, arg);
+			} catch (Throwable th) {
+				error(new ActorException("error on handle message: "
+						+ command + " by default message handler on actor:" + toString(), th),
+						command, arg);
+			}
+		} else {
+			try {
 				// 如果消息不被接受，则加入列队
 				if (!context.getOptionalMessageFilter()
 						.orElse(MessageFilter.defaultMessageFilter)
@@ -118,10 +144,11 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 					error(e, command, arg);
 				}
 				reDeliver();
+			} catch (Exception e) {
+				error(new ActorException("error on invoke method "
+						+ m.toString() + " on actor:" + toString(), e),
+						command, arg);
 			}
-		} catch (Exception e) {
-			error(new ActorException("error on invoke method " + m.toString()
-					+ " on actor:" + toString(), e), command, arg);
 		}
 	}
 
@@ -141,4 +168,21 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 		this.active = b;
 	}
 
+	public void addLink(ActorRef ar) {
+		linked.add(ar);
+	}
+
+	public void removeLink(ActorRef ar) {
+		linked.remove(ar);
+	}
+
+	@Override
+	public void link(ActorRef ar) {
+		this.actorSystem.getConfigure().getDispatcher().link(this, ar);
+	}
+
+	@Override
+	public void unlink(ActorRef ar) {
+		this.actorSystem.getConfigure().getDispatcher().unlink(this, ar);
+	}
 }
