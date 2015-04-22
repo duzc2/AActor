@@ -19,7 +19,7 @@ import com.ourpalm.hot.aactor.MessageFilter;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 import com.ourpalm.hot.aactor.config.messagehandler.Exit;
-import com.ourpalm.hot.aactor.config.messagehandler.SystemMessageHandler;
+import com.ourpalm.hot.aactor.config.messagehandler.NamedMessageHandler;
 
 public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
@@ -56,7 +56,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				}
 			}
 		}
-		context.setDefaultMessageHandler(new SystemMessageHandler(this));
+		context.setDefaultMessageHandler(new NamedMessageHandler(this));
 		setActive(true);
 	}
 

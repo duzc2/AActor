@@ -12,7 +12,7 @@ public class Kill implements MessageHandler {
 		public void SYSTEM_MESSAGE_PROFIX_kill(String reason);
 	}
 
-	public final static String COMMAND = SystemMessageHandler.SYSTEM_MESSAGE_PROFIX
+	public final static String COMMAND = NamedMessageHandler.SYSTEM_MESSAGE_PROFIX
 			+ "kill";
 
 	@Override

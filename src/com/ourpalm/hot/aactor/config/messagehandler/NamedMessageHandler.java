@@ -7,21 +7,23 @@ import java.util.Map;
 import com.ourpalm.hot.aactor.DefaultMessageHandler;
 import com.ourpalm.hot.aactor.impl.LocalSelfRef;
 
-public class SystemMessageHandler implements DefaultMessageHandler {
+public class NamedMessageHandler implements DefaultMessageHandler {
 	public static final String SYSTEM_MESSAGE_PROFIX = "SYSTEM_MESSAGE_PROFIX_";
-	public static Map<String, MessageHandler> handlers;
+	public static Map<String, MessageHandler> staticHandlers;
 	static {
 		HashMap<String, MessageHandler> _handlers = new HashMap<>();
 		_handlers.put(Monitor.COMMAND, new Monitor());
 		_handlers.put(Demonitor.COMMAND, new Demonitor());
 		_handlers.put(Exit.COMMAND, new Exit());
 		_handlers.put(Kill.COMMAND, new Kill());
-		handlers = Collections.unmodifiableMap(_handlers);
+		staticHandlers = Collections.unmodifiableMap(_handlers);
 	}
 
 	private LocalSelfRef self;
+	private HashMap<String, MessageHandler> handlers;
 
-	public SystemMessageHandler(LocalSelfRef self) {
+	public NamedMessageHandler(LocalSelfRef self) {
+		this.handlers = new HashMap<>(staticHandlers);
 		this.self = self;
 	}
 
@@ -33,4 +35,7 @@ public class SystemMessageHandler implements DefaultMessageHandler {
 		}
 	}
 
+	public HashMap<String, MessageHandler> getHandlers() {
+		return handlers;
+	}
 }

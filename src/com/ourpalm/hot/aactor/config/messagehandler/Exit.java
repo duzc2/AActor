@@ -10,7 +10,7 @@ public class Exit implements MessageHandler {
 				Throwable t);
 	}
 
-	public final static String COMMAND = SystemMessageHandler.SYSTEM_MESSAGE_PROFIX
+	public final static String COMMAND = NamedMessageHandler.SYSTEM_MESSAGE_PROFIX
 			+ "exit";
 
 	/**

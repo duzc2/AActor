@@ -8,7 +8,7 @@ public class Monitor implements MessageHandler {
 		void SYSTEM_MESSAGE_PROFIX_link(ActorRef ar);
 	}
 
-	public final static String COMMAND = SystemMessageHandler.SYSTEM_MESSAGE_PROFIX
+	public final static String COMMAND = NamedMessageHandler.SYSTEM_MESSAGE_PROFIX
 			+ "Monitor";
 
 	@Override
