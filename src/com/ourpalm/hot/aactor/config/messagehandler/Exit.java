@@ -21,10 +21,11 @@ public class Exit implements MessageHandler {
 		if (arg.length == 1) {
 			throw new ActorException(arg[0] + " exited.");
 		} else if (arg.length == 2) {
-			throw new ActorException(arg[0] + " exited,Because of " + arg[1]);
+			throw new ActorException(arg[0] + " exited,Because of \"" + arg[1]
+					+ "\"");
 		} else if (arg.length == 3) {
-			throw new ActorException(arg[0] + " exited,Because of " + arg[1],
-					(Throwable) arg[2]);
+			throw new ActorException(arg[0] + " exited,Because of \"" + arg[1]
+					+ "\"", (Throwable) arg[2]);
 		}
 	}
 

@@ -29,7 +29,7 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 
 	@Override
 	public void close() {
-		excutor.shutdown();
+		excutor.shutdownNow();
 	}
 
 	@Override

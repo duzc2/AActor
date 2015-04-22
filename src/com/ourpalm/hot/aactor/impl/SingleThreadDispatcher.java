@@ -51,7 +51,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 
 	@Override
 	public void close() {
-		this.executor.shutdown();
+		this.executor.shutdownNow();
 	}
 
 	@Override

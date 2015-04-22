@@ -1,5 +1,7 @@
 package com.ourpalm.hot.test.aactor.pingpong;
 
+import java.util.Arrays;
+
 import com.ourpalm.hot.aactor.Activate;
 import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
@@ -24,8 +26,13 @@ public class Ping {
 
 	@Activate
 	private void init(ActorSystem system, SelfRef selfRef) {
-		this.pong = system.createActorAndLink(selfRef,Pong.class, selfRef);
-		//thisRef.link(pong);
+		this.pong = system.createActorAndLink(selfRef, Pong.class, selfRef);
+		selfRef.getContext().setErrorHandler((t, command, arg) -> {
+			System.err.println(command + " : " + Arrays.toString(arg));
+			t.printStackTrace();
+			system.stop();
+		});
+		// thisRef.link(pong);
 		this.system = system;
 	}
 
