@@ -26,6 +26,6 @@ public class Pong {
 	public void tick(long time) {
 		// System.out.println("pong");
 		ping.sendMessage("tick", time);
-		//self.sendMessage(Kill.COMMAND, "test");
+		self.sendMessage(Kill.COMMAND, "test");
 	}
 }

@@ -12,6 +12,7 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
+import com.ourpalm.hot.aactor.config.messagehandler.Link;
 
 /**
  * 
@@ -25,7 +26,33 @@ public class DefaultActorBuilder implements ActorBuilder {
 	private ActorSystem actorSystem;
 
 	@Override
+	public ActorRef buildActorRefWithLink(ActorRef linker, Class<?> root,
+			Object[] args) {
+		LocalSelfRef self = makeSelfRef(root, args);
+		linker.sendMessage(Link.COMMAND, self);
+		self.link(linker);
+		try {
+			initActor(self);
+		} catch (Throwable t) {
+			throw new ActorException("Can't initialize actor:", t);
+		}
+		refMap.put(self.toString(), self);
+		return self;
+	}
+
+	@Override
 	public ActorRef buildActorRef(Class<?> root, Object[] args) {
+		LocalSelfRef self = makeSelfRef(root, args);
+		try {
+			initActor(self);
+		} catch (Throwable t) {
+			throw new ActorException("Can't initialize actor:", t);
+		}
+		refMap.put(self.toString(), self);
+		return self;
+	}
+
+	private LocalSelfRef makeSelfRef(Class<?> root, Object[] args) {
 		Constructor<?>[] declaredConstructors = root.getDeclaredConstructors();
 		Constructor<?> constructor = null;
 		if (args == null) {
@@ -57,12 +84,6 @@ public class DefaultActorBuilder implements ActorBuilder {
 		String id = "LocalActor-" + idgen.incrementAndGet() + "["
 				+ root.getCanonicalName() + "]";
 		LocalSelfRef af = new LocalSelfRef(a, id, refMap, actorSystem);
-		try {
-			initActor(af);
-		} catch (Throwable t) {
-			throw new ActorException("Can't initialize actor:", t);
-		}
-		refMap.put(af.toString(), af);
 		return af;
 	}
 

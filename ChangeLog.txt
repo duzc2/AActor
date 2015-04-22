@@ -1,5 +1,6 @@
 2015/4/22
  monitor support
+ ActorSystem.createAndLink()
 
 2015/4/21
  link process support

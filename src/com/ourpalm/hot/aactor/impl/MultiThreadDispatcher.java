@@ -104,4 +104,12 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 	public void unmonitor(SelfRef self, ActorRef ar) {
 		ar.sendMessage(Unlink.COMMAND, self);
 	}
+
+	@Override
+	public ActorRef createActorAndLink(ActorRef self, Class<?> clazz,
+			Object[] args) {
+		ActorRef ar = as.getConfigure().getActorBuilder()
+				.buildActorRefWithLink(self, clazz, args);
+		return ar;
+	}
 }

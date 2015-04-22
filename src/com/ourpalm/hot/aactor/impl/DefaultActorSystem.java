@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
+import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 import com.ourpalm.hot.aactor.config.ActorSystemConfigure;
 import com.ourpalm.hot.aactor.config.ConfigureLoader;
@@ -96,11 +97,10 @@ public class DefaultActorSystem implements ActorSystem {
 		return getConfigure().getDispatcher().queuedMessage();
 	}
 
-	// @Override
-	// public ActorRef createActorAndLink(SelfRef self, Class<?> clazz,
-	// Object... args) {
-	// return config.getDispatcher().createActorAndLink(self, clazz, args);
-	// }
-	//
+	@Override
+	public ActorRef createActorAndLink(SelfRef self, Class<?> clazz,
+			Object... args) {
+		return config.getDispatcher().createActorAndLink(self, clazz, args);
+	}
 
 }

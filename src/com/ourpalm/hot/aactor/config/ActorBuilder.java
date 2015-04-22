@@ -15,4 +15,6 @@ public interface ActorBuilder {
 	ActorRef findActorById(String actorId);
 
 	void detachActor(ActorRef ref);
+
+	ActorRef buildActorRefWithLink(ActorRef self, Class<?> clazz, Object[] args);
 }

@@ -23,9 +23,9 @@ public class Ping {
 	}
 
 	@Activate
-	private void init(ActorSystem system, SelfRef thisRef) {
-		this.pong = system.createActor(Pong.class, thisRef);
-		thisRef.link(pong);
+	private void init(ActorSystem system, SelfRef selfRef) {
+		this.pong = system.createActorAndLink(selfRef,Pong.class, selfRef);
+		//thisRef.link(pong);
 		this.system = system;
 	}
 

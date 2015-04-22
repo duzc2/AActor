@@ -20,10 +20,7 @@ public interface ActorSystem {
 
 	ActorRef createActor(Class<?> clazz, Object... args);
 
-	// ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object...
-	// args);
-	//
-
+	ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object... args);
 
 	void detachActor(ActorRef ref);
 

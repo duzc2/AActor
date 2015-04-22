@@ -34,4 +34,6 @@ public interface MessageDispatcher {
 	void monitor(SelfRef localSelfRef, ActorRef ar);
 
 	void unmonitor(SelfRef localSelfRef, ActorRef ar);
+
+	ActorRef createActorAndLink(ActorRef self, Class<?> clazz, Object[] args);
 }
