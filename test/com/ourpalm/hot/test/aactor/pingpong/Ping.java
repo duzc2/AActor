@@ -9,6 +9,7 @@ import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
+import com.ourpalm.hot.aactor.config.messagehandler.Kill.Killable;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
 @Actor
@@ -43,6 +44,8 @@ public class Ping {
 		if (time < TIME) {
 			System.out.println("ping " + time);
 			pong.sendMessage("tick", time);
+//			Killable killable = pong.asType(Killable.class);
+//			killable.SYSTEM_MESSAGE_PROFIX_kill("kill test");
 			// selfRef.demonitor(pong);
 		} else {
 			system.stop();

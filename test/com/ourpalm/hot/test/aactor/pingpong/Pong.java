@@ -36,10 +36,10 @@ public class Pong {
 //			exitNoticable.SYSTEM_MESSAGE_PROFIX_exit(self, "type test", null);
 			
 		}
-		if (time > 5) {
-			// self.sendMessage(Kill.COMMAND, "test");
-			Killable killable = self.asType(Kill.Killable.class);
-			killable.SYSTEM_MESSAGE_PROFIX_kill("test");
-		}
+//		if (time > 5) {
+//			// self.sendMessage(Kill.COMMAND, "test");
+//			Killable killable = self.asType(Kill.Killable.class);
+//			killable.SYSTEM_MESSAGE_PROFIX_kill("test");
+//		}
 	}
 }
