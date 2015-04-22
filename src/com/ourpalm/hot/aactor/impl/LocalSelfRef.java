@@ -190,4 +190,14 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	public Set<ActorRef> getLinked() {
 		return linked;
 	}
+
+	@Override
+	public void monitor(ActorRef ar) {
+		this.actorSystem.getConfigure().getDispatcher().monitor(this, ar);
+	}
+
+	@Override
+	public void unmonitor(ActorRef ar) {
+		this.actorSystem.getConfigure().getDispatcher().unmonitor(this, ar);
+	}
 }

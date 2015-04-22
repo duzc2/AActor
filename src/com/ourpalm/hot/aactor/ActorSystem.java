@@ -24,9 +24,6 @@ public interface ActorSystem {
 	// args);
 	//
 
-	// void monitor(SelfRef self, ActorRef ar);
-	//
-	// void unmonitor(SelfRef self, ActorRef ar);
 
 	void detachActor(ActorRef ref);
 

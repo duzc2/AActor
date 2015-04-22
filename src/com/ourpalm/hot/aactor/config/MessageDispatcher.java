@@ -31,7 +31,7 @@ public interface MessageDispatcher {
 
 	void unlink(SelfRef self, ActorRef ar);
 
-//	void monitor(SelfRef self, ActorRef ar);
-//
-//	void unmonitor(SelfRef self, ActorRef ar);
+	void monitor(SelfRef localSelfRef, ActorRef ar);
+
+	void unmonitor(SelfRef localSelfRef, ActorRef ar);
 }

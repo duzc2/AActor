@@ -19,7 +19,7 @@ public class Kill implements MessageHandler {
 		Set<ActorRef> refs = new HashSet<>(self.getLinked());
 		self.getLinked().clear();
 		for (ActorRef ar : refs) {
-			ar.sendMessage(Exit.COMMAND, self, reason);
+			ar.sendMessage(COMMAND, self, reason);
 		}
 	}
 }

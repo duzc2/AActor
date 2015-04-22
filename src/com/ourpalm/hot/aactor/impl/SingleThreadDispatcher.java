@@ -102,4 +102,14 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 		self.sendMessage(Unlink.COMMAND, ar);
 		ar.sendMessage(Unlink.COMMAND, self);
 	}
+
+	@Override
+	public void monitor(SelfRef localSelfRef, ActorRef ar) {
+		ar.sendMessage(Link.COMMAND, localSelfRef);
+	}
+
+	@Override
+	public void unmonitor(SelfRef self, ActorRef ar) {
+		ar.sendMessage(Unlink.COMMAND, self);
+	}
 }

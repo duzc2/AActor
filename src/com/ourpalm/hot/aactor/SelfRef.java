@@ -13,4 +13,8 @@ public interface SelfRef extends ActorRef {
 	void link(ActorRef ar);
 
 	void unlink(ActorRef ar);
+
+	void monitor(ActorRef ar);
+
+	void unmonitor(ActorRef ar);
 }
