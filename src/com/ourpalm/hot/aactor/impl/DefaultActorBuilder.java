@@ -12,6 +12,7 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
+import com.ourpalm.hot.aactor.config.messagehandler.Exit;
 import com.ourpalm.hot.aactor.config.messagehandler.Link;
 
 /**
@@ -28,13 +29,17 @@ public class DefaultActorBuilder implements ActorBuilder {
 	@Override
 	public ActorRef buildActorRefWithLink(ActorRef linker, Class<?> root,
 			Object[] args) {
-		LocalSelfRef self = makeSelfRef(root, args);
-		linker.sendMessage(Link.COMMAND, self);
-		self.link(linker);
+		LocalSelfRef self = null;
 		try {
+			self = makeSelfRef(root, args);
+			linker.sendMessage(Link.COMMAND, self);
+			self.link(linker);
 			initActor(self);
 		} catch (Throwable t) {
-			throw new ActorException("Can't initialize actor:", t);
+			ActorException e = new ActorException("Can't initialize actor:"
+					+ t.getMessage(), t);
+			linker.sendMessage(Exit.COMMAND, self, e.getMessage(), e);
+			throw e;
 		}
 		refMap.put(self.toString(), self);
 		return self;
@@ -46,7 +51,8 @@ public class DefaultActorBuilder implements ActorBuilder {
 		try {
 			initActor(self);
 		} catch (Throwable t) {
-			throw new ActorException("Can't initialize actor:", t);
+			throw new ActorException(
+					"Can't initialize actor:" + t.getMessage(), t);
 		}
 		refMap.put(self.toString(), self);
 		return self;
@@ -127,6 +133,9 @@ public class DefaultActorBuilder implements ActorBuilder {
 	@Override
 	public void detachActor(ActorRef ref) {
 		LocalSelfRef self = this.refMap.remove(ref.toString());
+		if (self == null) {
+			return;
+		}
 		self.setActive(false);
 		Object obj = self.getObj();
 		Method[] declaredMethods = obj.getClass().getDeclaredMethods();

@@ -91,6 +91,9 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 
 	@Override
 	public void unlink(SelfRef self, ActorRef ar) {
+		if (self == null || ar == null) {
+			return;
+		}
 		self.sendMessage(Unlink.COMMAND, ar);
 		ar.sendMessage(Unlink.COMMAND, self);
 	}
@@ -102,6 +105,9 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 
 	@Override
 	public void unmonitor(SelfRef self, ActorRef ar) {
+		if (self == null || ar == null) {
+			return;
+		}
 		ar.sendMessage(Unlink.COMMAND, self);
 	}
 
