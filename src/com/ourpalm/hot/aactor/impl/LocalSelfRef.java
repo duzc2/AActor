@@ -197,7 +197,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	}
 
 	@Override
-	public void unmonitor(ActorRef ar) {
-		this.actorSystem.getConfigure().getDispatcher().unmonitor(this, ar);
+	public void demonitor(ActorRef ar) {
+		this.actorSystem.getConfigure().getDispatcher().demonitor(this, ar);
 	}
 }

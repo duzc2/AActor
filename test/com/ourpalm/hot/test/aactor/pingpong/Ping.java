@@ -18,6 +18,7 @@ public class Ping {
 	private ActorSystem system;
 	private long startTime;
 	private long startTimeMS;
+	private SelfRef selfRef;
 
 	public Ping() {
 		this.startTime = System.nanoTime();
@@ -34,13 +35,15 @@ public class Ping {
 		this.pong = system.createActorAndLink(selfRef, Pong.class, selfRef);
 		// thisRef.link(pong);
 		this.system = system;
+		this.selfRef = selfRef;
 	}
 
 	@Mailbox
 	public void tick(long time) {
 		if (time < TIME) {
-			// System.out.println("ping");
-			pong.sendMessage("tick", time + 1);
+			System.out.println("ping " + time);
+			pong.sendMessage("tick", time);
+			// selfRef.demonitor(pong);
 		} else {
 			system.stop();
 			System.out.println(TIME + " Finished."
@@ -51,8 +54,7 @@ public class Ping {
 
 	public static void main(String[] args) {
 		ActorSystem actorSystem = new ActorSystemBuilder()
-				.setMessageDispatcher(new MultiThreadDispatcher())
-				.build();
+				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		ActorRef actor = actorSystem.start(Ping.class);
 		actor.sendMessage("tick", 0);
 	}

@@ -1,5 +1,6 @@
 package com.ourpalm.hot.aactor.impl;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,6 +55,13 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 					@Override
 					public Thread newThread(Runnable r) {
 						Thread t = new Thread(r);
+						t.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+
+							@Override
+							public void uncaughtException(Thread t, Throwable e) {
+								e.printStackTrace();
+							}
+						});
 						t.setName("MultiThreadDispatcher-"
 								+ id.getAndIncrement());
 						return t;
@@ -104,7 +112,7 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 	}
 
 	@Override
-	public void unmonitor(SelfRef self, ActorRef ar) {
+	public void demonitor(SelfRef self, ActorRef ar) {
 		if (self == null || ar == null) {
 			return;
 		}

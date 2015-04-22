@@ -112,7 +112,7 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 	}
 
 	@Override
-	public void unmonitor(SelfRef self, ActorRef ar) {
+	public void demonitor(SelfRef self, ActorRef ar) {
 		if (self == null || ar == null) {
 			return;
 		}

@@ -16,5 +16,5 @@ public interface SelfRef extends ActorRef {
 
 	void monitor(ActorRef ar);
 
-	void unmonitor(ActorRef ar);
+	void demonitor(ActorRef ar);
 }

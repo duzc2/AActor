@@ -15,19 +15,21 @@ public class Pong {
 
 	public Pong(ActorRef ping) {
 		this.ping = ping;
-		//throw new RuntimeException("test");
+		// throw new RuntimeException("test");
 	}
 
 	@Activate
 	private void init(ActorSystem system, SelfRef thisRef) {
 		this.self = thisRef;
-		throw new RuntimeException("test");
+		// throw new RuntimeException("test");
 	}
 
 	@Mailbox
 	public void tick(long time) {
-		// System.out.println("pong");
-		ping.sendMessage("tick", time);
-		// self.sendMessage(Kill.COMMAND, "test");
+		System.out.println("pong " + time);
+		ping.sendMessage("tick", time + 1);
+		if (time > 5) {
+			self.sendMessage(Kill.COMMAND, "test");
+		}
 	}
 }
