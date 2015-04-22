@@ -8,8 +8,8 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
-import com.ourpalm.hot.aactor.config.messagehandler.Link;
-import com.ourpalm.hot.aactor.config.messagehandler.Unlink;
+import com.ourpalm.hot.aactor.config.messagehandler.Monitor;
+import com.ourpalm.hot.aactor.config.messagehandler.Demonitor;
 import com.ourpalm.hot.aactor.impl.executor.OrderedExecutor;
 import com.ourpalm.hot.aactor.impl.executor.OrderedExecutors;
 
@@ -93,8 +93,8 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 
 	@Override
 	public void link(SelfRef self, ActorRef ar) {
-		self.sendMessage(Link.COMMAND, ar);
-		ar.sendMessage(Link.COMMAND, self);
+		self.sendMessage(Monitor.COMMAND, ar);
+		ar.sendMessage(Monitor.COMMAND, self);
 	}
 
 	@Override
@@ -102,13 +102,13 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 		if (self == null || ar == null) {
 			return;
 		}
-		self.sendMessage(Unlink.COMMAND, ar);
-		ar.sendMessage(Unlink.COMMAND, self);
+		self.sendMessage(Demonitor.COMMAND, ar);
+		ar.sendMessage(Demonitor.COMMAND, self);
 	}
 
 	@Override
 	public void monitor(SelfRef localSelfRef, ActorRef ar) {
-		ar.sendMessage(Link.COMMAND, localSelfRef);
+		ar.sendMessage(Monitor.COMMAND, localSelfRef);
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class MultiThreadDispatcher implements MessageDispatcher {
 		if (self == null || ar == null) {
 			return;
 		}
-		ar.sendMessage(Unlink.COMMAND, self);
+		ar.sendMessage(Demonitor.COMMAND, self);
 	}
 
 	@Override

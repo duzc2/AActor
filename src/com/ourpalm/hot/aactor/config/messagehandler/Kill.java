@@ -8,6 +8,10 @@ import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.impl.LocalSelfRef;
 
 public class Kill implements MessageHandler {
+	public static interface Killable {
+		public void SYSTEM_MESSAGE_PROFIX_kill(String reason);
+	}
+
 	public final static String COMMAND = SystemMessageHandler.SYSTEM_MESSAGE_PROFIX
 			+ "kill";
 

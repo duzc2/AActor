@@ -5,6 +5,10 @@ import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.impl.LocalSelfRef;
 
 public class Exit implements MessageHandler {
+	public static interface ExitNoticable {
+		public void SYSTEM_MESSAGE_PROFIX_exit(ActorRef who, String why, Throwable t);
+	}
+
 	public final static String COMMAND = SystemMessageHandler.SYSTEM_MESSAGE_PROFIX
 			+ "exit";
 

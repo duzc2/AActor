@@ -12,8 +12,8 @@ public class SystemMessageHandler implements DefaultMessageHandler {
 	public static Map<String, MessageHandler> handlers;
 	static {
 		HashMap<String, MessageHandler> _handlers = new HashMap<>();
-		_handlers.put(Link.COMMAND, new Link());
-		_handlers.put(Unlink.COMMAND, new Unlink());
+		_handlers.put(Monitor.COMMAND, new Monitor());
+		_handlers.put(Demonitor.COMMAND, new Demonitor());
 		_handlers.put(Exit.COMMAND, new Exit());
 		_handlers.put(Kill.COMMAND, new Kill());
 		handlers = Collections.unmodifiableMap(_handlers);
