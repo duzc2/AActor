@@ -24,6 +24,18 @@ public interface OrderedExecutor {
 	public void execute(Object obj, Runnable command);
 
 	/**
+	 * 优先异步执行指令
+	 * 
+	 * 此指令将被放置于执行列队最前端
+	 * 
+	 * 在执行指令时，此执行器对obj的指令顺序。
+	 * 
+	 * @param obj
+	 * @param command
+	 */
+	public void executePreferentially(Object obj, Runnable command);
+
+	/**
 	 * 相对于所有对象执行单线程指令
 	 * 
 	 * @param command
@@ -37,6 +49,14 @@ public interface OrderedExecutor {
 	 * @return
 	 */
 	public <T> Future<T> execute(Object obj, Callable<T> query);
+
+	/**
+	 * 
+	 * @param obj
+	 * @param query
+	 * @return
+	 */
+	public <T> Future<T> executePreferentially(Object obj, Callable<T> query);
 
 	/**
 	 * 启动最大线程

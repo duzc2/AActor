@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadFactory;
@@ -27,7 +28,7 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 
 	public class TasksQueue {
 		/** A queue of ordered event waiting to be processed */
-		private final LinkedTransferQueue<Runnable> tasksQueue = new LinkedTransferQueue<Runnable>();
+		private final LinkedBlockingDeque<Runnable> tasksQueue = new LinkedBlockingDeque<Runnable>();
 
 		/** 对key的引用，防止由于GC导致任务丢失 */
 		private Object key;
@@ -258,6 +259,10 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 
 	@Override
 	public <T> Future<T> execute(Object obj, Callable<T> query) {
+		return execute(obj, query, true);
+	}
+
+	public <T> Future<T> execute(Object obj, Callable<T> query, boolean first) {
 		Object currentOrderedExecuteObject = ThreadSign
 				.getCurrentOrderedExecuteObject();
 		if (currentOrderedExecuteObject == obj
@@ -272,7 +277,11 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 		boolean offerObj = true;
 		synchronized (tasksQueue) {
 			// Inject the event into the executor taskQueue
-			tasksQueue.tasksQueue.offer(command);
+			if (first) {
+				tasksQueue.tasksQueue.offerLast(command);
+			} else {
+				tasksQueue.tasksQueue.offerFirst(command);
+			}
 			if (tasksQueue.processingCompleted) {
 				tasksQueue.processingCompleted = false;
 			} else {
@@ -288,6 +297,10 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 
 	@Override
 	public void execute(Object obj, Runnable command) {
+		execute(obj, command, true);
+	}
+
+	public void execute(Object obj, Runnable command, boolean first) {
 		Object currentOrderedExecuteObject = ThreadSign
 				.getCurrentOrderedExecuteObject();
 		if (currentOrderedExecuteObject == obj
@@ -300,7 +313,12 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 		boolean offerObj = true;
 		synchronized (tasksQueue) {
 			// Inject the event into the executor taskQueue
-			tasksQueue.tasksQueue.offer(command);
+			if (first) {
+				tasksQueue.tasksQueue.offerLast(command);
+			} else {
+				tasksQueue.tasksQueue.offerFirst(command);
+			}
+
 			if (tasksQueue.processingCompleted) {
 				tasksQueue.processingCompleted = false;
 			} else {
@@ -483,5 +501,15 @@ public class OrderedExecutorImpl /* extends ThreadPoolExecutor */implements
 			queue.tasksQueue.clear();
 		}
 		return ret;
+	}
+
+	@Override
+	public void executePreferentially(Object obj, Runnable command) {
+		execute(obj, command, false);
+	}
+
+	@Override
+	public <T> Future<T> executePreferentially(Object obj, Callable<T> query) {
+		return execute(obj, query, false);
 	}
 }

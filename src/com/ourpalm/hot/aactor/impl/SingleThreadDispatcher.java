@@ -2,23 +2,18 @@ package com.ourpalm.hot.aactor.impl;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import com.ourpalm.hot.aactor.ActorRef;
-import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.SelfRef;
-import com.ourpalm.hot.aactor.config.MessageDispatcher;
-import com.ourpalm.hot.aactor.config.messagehandler.Monitor;
-import com.ourpalm.hot.aactor.config.messagehandler.Demonitor;
 
-public class SingleThreadDispatcher implements MessageDispatcher {
+public class SingleThreadDispatcher extends AbstractDispatcher {
 
-	private ActorSystem as;
-	private AtomicLong queuedMessage = new AtomicLong();
-	private ExecutorService executor = Executors
-			.newSingleThreadExecutor(new ThreadFactory() {
+	private LinkedBlockingDeque<Runnable> messageDeque = new LinkedBlockingDeque<>();
+	private ExecutorService executor = new ThreadPoolExecutor(1, 1, 0L,
+			TimeUnit.MILLISECONDS, messageDeque, new ThreadFactory() {
 
 				@Override
 				public Thread newThread(Runnable r) {
@@ -36,16 +31,19 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 			});
 
 	@Override
-	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
-			throws Exception {
+	public void sendNormalMessage(SelfRef ar, Object a, String command,
+			Object[] arg) throws Exception {
 
 		queuedMessage.incrementAndGet();
-		executor.submit(new Runnable() {
+		executor.submit(() -> ar.call(command, arg));
+	}
 
-			@Override
-			public void run() {
-				ar.call(command, arg);
-			}
+	@Override
+	protected void sendPriorMessage(SelfRef ar, Object a, String command,
+			Object[] arg) throws Exception {
+		queuedMessage.incrementAndGet();
+		messageDeque.addLast(() -> ar.call(command, arg));
+		executor.submit(() -> {
 		});
 	}
 
@@ -54,76 +52,4 @@ public class SingleThreadDispatcher implements MessageDispatcher {
 		this.executor.shutdownNow();
 	}
 
-	@Override
-	public ActorRef createActor(Class<?> clazz, Object[] args) {
-		ActorRef ar = as.getConfigure().getActorBuilder()
-				.buildActorRef(clazz, args);
-		return ar;
-	}
-
-	@Override
-	public void detachActor(ActorRef ref) {
-		as.getConfigure().getActorBuilder().detachActor(ref);
-	}
-
-	@Override
-	public void init(ActorSystem as) {
-		this.as = as;
-	}
-
-	@Override
-	public ActorRef findActor(Class<?> class1) {
-		return as.getConfigure().getActorBuilder().findActor(class1);
-	}
-
-	@Override
-	public ActorRef findActorById(String actorId) {
-		return as.getConfigure().getActorBuilder().findActorById(actorId);
-	}
-
-	@Override
-	public long queuedMessage() {
-		return queuedMessage.get();
-	}
-
-	@Override
-	public void decrementQueuedMessage() {
-		queuedMessage.decrementAndGet();
-	}
-
-	@Override
-	public void link(SelfRef self, ActorRef ar) {
-		self.sendMessage(Monitor.COMMAND, ar);
-		ar.sendMessage(Monitor.COMMAND, self);
-	}
-
-	@Override
-	public void unlink(SelfRef self, ActorRef ar) {
-		if (self == null || ar == null) {
-			return;
-		}
-		self.sendMessage(Demonitor.COMMAND, ar);
-		ar.sendMessage(Demonitor.COMMAND, self);
-	}
-
-	@Override
-	public void monitor(SelfRef localSelfRef, ActorRef ar) {
-		ar.sendMessage(Monitor.COMMAND, localSelfRef);
-	}
-
-	@Override
-	public void demonitor(SelfRef self, ActorRef ar) {
-		if (self == null || ar == null) {
-			return;
-		}
-		ar.sendMessage(Demonitor.COMMAND, self);
-	}
-
-	@Override
-	public ActorRef createActorAndLink(ActorRef self, Class<?> clazz,
-			Object[] args) {
-		ActorRef ar = as.getConfigure().getActorBuilder()
-				.buildActorRefWithLink(self, clazz, args);
-		return ar;
-	}
 }
