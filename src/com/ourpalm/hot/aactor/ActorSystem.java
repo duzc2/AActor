@@ -2,6 +2,7 @@ package com.ourpalm.hot.aactor;
 
 import java.util.Map;
 
+import com.ourpalm.hot.aactor.actors.TimerActor;
 import com.ourpalm.hot.aactor.config.ActorSystemConfigure;
 
 public interface ActorSystem {
@@ -33,4 +34,6 @@ public interface ActorSystem {
 	Map<String, ActorRef> registered();
 
 	long queuedMessage();
+
+	TimerActor getTimerActor();
 }

@@ -33,8 +33,8 @@ public class SimpleTest {
 	private ActorRef anotherActor;
 
 	@Activate
-	public void init(ActorSystem system, SelfRef thisRef) {
-		this.selfRef = thisRef;
+	public void init(ActorSystem system, SelfRef selfRef) {
+		this.selfRef = selfRef;
 		this.actorSystem = system;
 		System.out.println("Instance of SimpleTest is created.");
 	}

@@ -8,14 +8,17 @@ import com.ourpalm.hot.aactor.Actor;
 import com.ourpalm.hot.aactor.ActorRef;
 import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.SelfRef;
+import com.ourpalm.hot.aactor.actors.TimerActor;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 import com.ourpalm.hot.aactor.config.ActorSystemConfigure;
 import com.ourpalm.hot.aactor.config.ConfigureLoader;
+import com.ourpalm.hot.aactor.config.messagehandler.Kill.Killable;
 
 public class DefaultActorSystem implements ActorSystem {
 	private ActorSystemConfigure config;
 	private ActorRef rootActor;
 	private ConcurrentHashMap<String, ActorRef> registerMap = new ConcurrentHashMap<>();
+	private volatile ActorRef timerActorRef = null;
 
 	public DefaultActorSystem(ActorSystemConfigure config) {
 		config = config != null ? config : ConfigureLoader.loadConfigure();
@@ -41,6 +44,11 @@ public class DefaultActorSystem implements ActorSystem {
 
 	@Override
 	public void stop() {
+		if (timerActorRef != null) {
+			timerActorRef.asType(Killable.class).SYSTEM_MESSAGE_PROFIX_kill(
+					"shutdown");
+		}
+		rootActor.asType(Killable.class).SYSTEM_MESSAGE_PROFIX_kill("shutdown");
 		config.getDispatcher().close();
 	}
 
@@ -101,6 +109,19 @@ public class DefaultActorSystem implements ActorSystem {
 	public ActorRef createActorAndLink(SelfRef self, Class<?> clazz,
 			Object... args) {
 		return config.getDispatcher().createActorAndLink(self, clazz, args);
+	}
+
+	@Override
+	public TimerActor getTimerActor() {
+		if (timerActorRef != null) {
+			return timerActorRef.asType(TimerActor.class);
+		}
+		synchronized (this) {
+			if (timerActorRef == null) {
+				timerActorRef = createActor(DefaultTimerActor.class);
+			}
+		}
+		return timerActorRef.asType(TimerActor.class);
 	}
 
 }

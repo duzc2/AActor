@@ -17,4 +17,6 @@ public interface SelfRef extends ActorRef {
 	void monitor(ActorRef ar);
 
 	void demonitor(ActorRef ar);
+
+	void timeout(long delay, String callbackCommand);
 }

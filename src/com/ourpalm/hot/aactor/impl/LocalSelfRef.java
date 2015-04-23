@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.ourpalm.hot.aactor.ActorContext;
 import com.ourpalm.hot.aactor.ActorException;
@@ -17,12 +18,14 @@ import com.ourpalm.hot.aactor.Command;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.MessageFilter;
 import com.ourpalm.hot.aactor.SelfRef;
+import com.ourpalm.hot.aactor.actors.TimerActor;
 import com.ourpalm.hot.aactor.config.MessageDispatcher;
 import com.ourpalm.hot.aactor.config.messagehandler.Exit;
 import com.ourpalm.hot.aactor.config.messagehandler.NamedMessageHandler;
 
 public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
+	private static WeakHashMap<Class<?>, HashMap<String, Method>> classCache = new WeakHashMap<>();
 	private Object obj;
 	private final ActorContext context = new ActorContext();
 	private final Set<ActorRef> linked = new HashSet<>();
@@ -33,8 +36,36 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 			Map<String, LocalSelfRef> refMap, ActorSystem actorSystem) {
 		super(id, refMap, actorSystem);
 		this.obj = obj;
-		this.mailboxCache = new HashMap<>();
-		Method[] methods = obj.getClass().getDeclaredMethods();
+		Class<?> clazz = obj.getClass();
+		synchronized (classCache) {
+			this.mailboxCache = classCache.get(clazz);
+
+			if (mailboxCache == null) {
+				this.mailboxCache = new HashMap<>();
+				while (clazz != null && clazz != Object.class) {
+					Method[] methods = clazz.getDeclaredMethods();
+					putMailbox(methods);
+					Class<?>[] interfaces = clazz.getInterfaces();
+					iterateInterface(interfaces);
+					clazz = clazz.getSuperclass();
+				}
+				classCache.put(clazz, mailboxCache);
+			}
+		}
+		context.setDefaultMessageHandler(new NamedMessageHandler(this));
+		setActive(true);
+	}
+
+	private void iterateInterface(Class<?>[] interfaces) {
+		for (Class<?> interfaze : interfaces) {
+			Method[] imethods = interfaze.getDeclaredMethods();
+			putMailbox(imethods);
+			Class<?>[] interfaces2 = interfaze.getInterfaces();
+			iterateInterface(interfaces2);
+		}
+	}
+
+	private void putMailbox(Method[] methods) {
 		for (Method method : methods) {
 			Mailbox annotation = method.getAnnotation(Mailbox.class);
 			if (annotation != null) {
@@ -43,8 +74,13 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				if (name.equals("")) {
 					name = method.getName();
 				}
-				if (mailboxCache.containsKey(name)) {
-					throw new ActorException("Duplicated Mailbox " + name);
+				Method putMethod = mailboxCache.get(name);
+				if (putMethod != null) {
+					if (putMethod.getName().equals(method.getName())) {
+						continue;
+					} else {
+						throw new ActorException("Duplicated Mailbox " + name);
+					}
 				}
 				Class<?> returnType = method.getReturnType();
 				if (returnType == Void.class || returnType == void.class) {
@@ -56,8 +92,6 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 				}
 			}
 		}
-		context.setDefaultMessageHandler(new NamedMessageHandler(this));
-		setActive(true);
 	}
 
 	public Object getObj() {
@@ -201,5 +235,11 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 	@Override
 	public void demonitor(ActorRef ar) {
 		this.actorSystem.getConfigure().getDispatcher().demonitor(this, ar);
+	}
+
+	@Override
+	public void timeout(long delay, String callbackCommand) {
+		TimerActor tar = this.actorSystem.getTimerActor();
+		tar.timeout(this, delay, callbackCommand);
 	}
 }

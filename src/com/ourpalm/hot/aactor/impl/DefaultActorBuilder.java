@@ -61,9 +61,12 @@ public class DefaultActorBuilder implements ActorBuilder {
 	private LocalSelfRef makeSelfRef(Class<?> root, Object[] args) {
 		Constructor<?>[] declaredConstructors = root.getDeclaredConstructors();
 		Constructor<?> constructor = null;
-		if (args == null) {
+		Object a = null;
+		if (args == null || args.length == 0) {
 			try {
 				constructor = root.getDeclaredConstructor(new Class<?>[0]);
+				constructor.setAccessible(true);
+				a = constructor.newInstance();
 			} catch (Exception e) {
 				throw new ActorException("No constructor for class "
 						+ root.getCanonicalName()
@@ -79,16 +82,16 @@ public class DefaultActorBuilder implements ActorBuilder {
 					}
 				}
 				constructor = cons;
+				try {
+					constructor.setAccessible(true);
+					a = constructor.newInstance(args);
+				} catch (Exception e) {
+					throw new ActorException("Can't instance class "
+							+ root.getCanonicalName()
+							+ " with specified arguments.", e);
+				}
 				break L1;
 			}
-		}
-		Object a;
-		try {
-			constructor.setAccessible(true);
-			a = constructor.newInstance(args);
-		} catch (Exception e) {
-			throw new ActorException("Can't instance class "
-					+ root.getCanonicalName() + " with specified arguments.", e);
 		}
 		String id = "LocalActor-" + idgen.incrementAndGet() + "["
 				+ root.getCanonicalName() + "]";
