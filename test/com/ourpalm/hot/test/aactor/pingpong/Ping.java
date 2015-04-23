@@ -21,7 +21,7 @@ public class Ping {
 	private long startTimeMS;
 	private SelfRef selfRef;
 
-	public Ping() {
+	private Ping() {
 		this.startTime = System.nanoTime();
 		this.startTimeMS = System.currentTimeMillis();
 	}

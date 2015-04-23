@@ -63,25 +63,28 @@ public class DefaultActorBuilder implements ActorBuilder {
 		Constructor<?> constructor = null;
 		if (args == null) {
 			try {
-				constructor = root.getConstructor(new Class<?>[0]);
+				constructor = root.getDeclaredConstructor(new Class<?>[0]);
 			} catch (Exception e) {
 				throw new ActorException("No constructor for class "
 						+ root.getCanonicalName()
 						+ " with specified arguments.", e);
 			}
-		}
-		L1: for (Constructor<?> cons : declaredConstructors) {
-			Class<?>[] parameterTypes = cons.getParameterTypes();
-			for (int i = 0; i < parameterTypes.length - 1; i++) {
-				if (i >= args.length || !parameterTypes[i].isInstance(args[i])) {
-					continue L1;
+		} else {
+			L1: for (Constructor<?> cons : declaredConstructors) {
+				Class<?>[] parameterTypes = cons.getParameterTypes();
+				for (int i = 0; i < parameterTypes.length - 1; i++) {
+					if (i >= args.length
+							|| !parameterTypes[i].isInstance(args[i])) {
+						continue L1;
+					}
 				}
+				constructor = cons;
+				break L1;
 			}
-			constructor = cons;
-			break L1;
 		}
 		Object a;
 		try {
+			constructor.setAccessible(true);
 			a = constructor.newInstance(args);
 		} catch (Exception e) {
 			throw new ActorException("Can't instance class "

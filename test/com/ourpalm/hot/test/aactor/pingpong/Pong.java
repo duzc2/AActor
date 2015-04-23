@@ -16,7 +16,7 @@ public class Pong {
 	private ActorRef ping;
 	private SelfRef self;
 
-	public Pong(ActorRef ping) {
+	private Pong(ActorRef ping) {
 		this.ping = ping;
 		// throw new RuntimeException("test");
 	}
