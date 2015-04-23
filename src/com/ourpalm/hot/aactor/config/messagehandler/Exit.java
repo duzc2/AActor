@@ -6,6 +6,8 @@ import com.ourpalm.hot.aactor.impl.LocalSelfRef;
 
 public class Exit implements MessageHandler {
 	public static interface ExitNoticable {
+		public String normal = "normal";
+
 		public void SYSTEM_MESSAGE_PROFIX_exit(ActorRef who, String why,
 				Throwable t);
 	}
@@ -26,7 +28,7 @@ public class Exit implements MessageHandler {
 		if (arg.length == 1) {
 			throw new ActorException(arg[0] + " exited.");
 		} else if (arg.length == 2) {
-			if (!"normal".equals(arg[1])) {
+			if (!ExitNoticable.normal.equals(arg[1])) {
 				throw new ActorException(arg[0] + " exited,Because of \""
 						+ arg[1] + "\"");
 			}
