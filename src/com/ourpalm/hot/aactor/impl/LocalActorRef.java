@@ -23,6 +23,9 @@ public class LocalActorRef implements ActorRef {
 
 	@Override
 	public void sendMessage(String command, Object... arg) {
+		if (command == null) {
+			throw new NullPointerException("command is null.");
+		}
 		LocalSelfRef a = refMap.get(id);
 		if (a == null) {
 			throw new ActorException("can't find actor with id:" + id);

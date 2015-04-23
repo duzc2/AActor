@@ -25,8 +25,8 @@ public interface MessageDispatcher {
 
 	void decrementQueuedMessage();
 
-//	ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object[] args);
-//
+	// ActorRef createActorAndLink(SelfRef self, Class<?> clazz, Object[] args);
+	//
 	void link(SelfRef self, ActorRef ar);
 
 	void unlink(SelfRef self, ActorRef ar);

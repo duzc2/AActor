@@ -32,14 +32,15 @@ public class Pong {
 		System.out.println("pong " + time);
 		ping.sendMessage("tick", time + 1);
 		if (time > 2) {
-//			ExitNoticable exitNoticable = ping.asType(ExitNoticable.class);
-//			exitNoticable.SYSTEM_MESSAGE_PROFIX_exit(self, "type test", null);
-			
+			// ExitNoticable exitNoticable = ping.asType(ExitNoticable.class);
+			// exitNoticable.SYSTEM_MESSAGE_PROFIX_exit(self, "type test",
+			// null);
+
 		}
-//		if (time > 5) {
-//			// self.sendMessage(Kill.COMMAND, "test");
-//			Killable killable = self.asType(Kill.Killable.class);
-//			killable.SYSTEM_MESSAGE_PROFIX_kill("test");
-//		}
+		// if (time > 5) {
+		// // self.sendMessage(Kill.COMMAND, "test");
+		// Killable killable = self.asType(Kill.Killable.class);
+		// killable.SYSTEM_MESSAGE_PROFIX_kill("test");
+		// }
 	}
 }

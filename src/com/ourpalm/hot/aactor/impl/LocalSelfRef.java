@@ -71,6 +71,9 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	@Override
 	public void sendMessage(String command, Object... arg) {
+		if (command == null) {
+			throw new NullPointerException("command is null.");
+		}
 		try {
 			sendMessage_(command, arg);
 		} catch (Throwable t) {
@@ -85,8 +88,7 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 					.orElseThrow(
 							() -> new RuntimeException(
 									"Except while handle command '" + command
-											+ "' on actor '"
-											+ toString()
+											+ "' on actor '" + toString()
 											+ "' with args:"
 											+ Arrays.toString(arg), t))
 					.onError(t, command, arg);

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ourpalm.hot.aactor.ActorException;
 import com.ourpalm.hot.aactor.DefaultMessageHandler;
 import com.ourpalm.hot.aactor.impl.LocalSelfRef;
 
@@ -32,6 +33,8 @@ public class NamedMessageHandler implements DefaultMessageHandler {
 		MessageHandler messageHandler = handlers.get(command);
 		if (messageHandler != null) {
 			messageHandler.handle(self, command, arg);
+		} else {
+			throw new ActorException("no hanlder of command:" + command);
 		}
 	}
 

@@ -44,8 +44,8 @@ public class Ping {
 		if (time < TIME) {
 			System.out.println("ping " + time);
 			pong.sendMessage("tick", time);
-//			Killable killable = pong.asType(Killable.class);
-//			killable.SYSTEM_MESSAGE_PROFIX_kill("kill test");
+			// Killable killable = pong.asType(Killable.class);
+			// killable.SYSTEM_MESSAGE_PROFIX_kill("kill test");
 			// selfRef.demonitor(pong);
 		} else {
 			system.stop();
