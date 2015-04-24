@@ -31,7 +31,9 @@ public class Ping {
 		selfRef.getContext().setErrorHandler((t, command, arg) -> {
 			System.err.println(command + " : " + Arrays.toString(arg));
 			t.printStackTrace();
-			system.stop();
+			if (system.isStarted()) {
+				system.stop();
+			}
 		});
 		this.pong = system.createActorAndLink(selfRef, Pong.class, selfRef);
 		// thisRef.link(pong);

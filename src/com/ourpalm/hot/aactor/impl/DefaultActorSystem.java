@@ -19,6 +19,7 @@ public class DefaultActorSystem implements ActorSystem {
 	private ActorRef rootActor;
 	private ConcurrentHashMap<String, ActorRef> registerMap = new ConcurrentHashMap<>();
 	private volatile ActorRef timerActorRef = null;
+	private volatile boolean started = false;
 
 	public DefaultActorSystem(ActorSystemConfigure config) {
 		config = config != null ? config : ConfigureLoader.loadConfigure();
@@ -26,7 +27,10 @@ public class DefaultActorSystem implements ActorSystem {
 	}
 
 	@Override
-	public ActorRef start(Class<?> root, Object... args) {
+	public synchronized ActorRef start(Class<?> root, Object... args) {
+		if (started) {
+			throw new IllegalStateException("ActorSystem have been started.");
+		}
 		if (root == null) {
 			throw new NullPointerException("root actor class is null");
 		}
@@ -39,11 +43,16 @@ public class DefaultActorSystem implements ActorSystem {
 		actorBuilder.init(this);
 		config.getDispatcher().init(this);
 		this.rootActor = createActor(root, args);
+		started = true;
 		return rootActor;
 	}
 
 	@Override
-	public void stop() {
+	public synchronized void stop() {
+		if (!started) {
+			throw new IllegalStateException("ActorSystem have been started.");
+		}
+		started = false;
 		if (timerActorRef != null) {
 			timerActorRef.asType(Killable.class).SYSTEM_MESSAGE_PROFIX_kill(
 					"shutdown");
@@ -122,6 +131,11 @@ public class DefaultActorSystem implements ActorSystem {
 			}
 		}
 		return timerActorRef.asType(TimerActor.class);
+	}
+
+	@Override
+	public boolean isStarted() {
+		return started;
 	}
 
 }

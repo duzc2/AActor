@@ -36,4 +36,6 @@ public interface ActorSystem {
 	long queuedMessage();
 
 	TimerActor getTimerActor();
+
+	boolean isStarted();
 }

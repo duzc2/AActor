@@ -127,9 +127,12 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 											+ Arrays.toString(arg), t))
 					.onError(t, command, arg);
 		} catch (Throwable th) {
-			this.actorSystem.detachActor(this);
-			for (ActorRef ar : linked) {
-				ar.sendMessage(Exit.COMMAND, this, th.getLocalizedMessage(), th);
+			if (actorSystem.isStarted()) {
+				this.actorSystem.detachActor(this);
+				for (ActorRef ar : linked) {
+					ar.sendMessage(Exit.COMMAND, this,
+							th.getLocalizedMessage(), th);
+				}
 			}
 			th.printStackTrace();
 		}
@@ -220,7 +223,9 @@ public class LocalSelfRef extends LocalActorRef implements SelfRef {
 
 	@Override
 	public void unlink(ActorRef ar) {
-		this.actorSystem.getConfigure().getDispatcher().unlink(this, ar);
+		if (actorSystem.isStarted()) {
+			this.actorSystem.getConfigure().getDispatcher().unlink(this, ar);
+		}
 	}
 
 	public Set<ActorRef> getLinked() {
