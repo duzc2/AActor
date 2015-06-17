@@ -8,13 +8,13 @@ import com.ourpalm.hot.aactor.ActorSystemBuilder;
 import com.ourpalm.hot.aactor.Mailbox;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.actors.TimerActor;
-import com.ourpalm.hot.aactor.impl.DefaultTimerActor;
+import com.ourpalm.hot.aactor.impl.SimpleTimerActor;
 import com.ourpalm.hot.aactor.impl.MultiThreadDispatcher;
 
 @Actor
 public class TimerActorTest {
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args){
 		ActorSystem actorSystem = new ActorSystemBuilder()
 				.setMessageDispatcher(new MultiThreadDispatcher()).build();
 		ActorRef actor = actorSystem.start(TimerActorTest.class);
@@ -28,9 +28,9 @@ public class TimerActorTest {
 	private void init(ActorSystem system, SelfRef selfRef) {
 		this.system = system;
 		this.selfRef = selfRef;
-		this.t1 = system.createActorAndLink(selfRef, DefaultTimerActor.class,
+		this.t1 = system.createActorAndLink(selfRef, SimpleTimerActor.class,
 				"test").asType(TimerActor.class);
-		t1.timeout(selfRef, 10, "repeat");
+		t1.timeout(selfRef, 10, "repeat","WWWWW");
 		selfRef.timeout(1000, "timeout");
 	}
 
@@ -41,8 +41,8 @@ public class TimerActorTest {
 	}
 
 	@Mailbox
-	private void repeat() {
-		System.out.println("repeat");
-		t1.timeout(selfRef, 10, "repeat");
+	private void repeat(String w) {
+		System.out.println("repeat" + w);
+		t1.timeout(selfRef, 1000, "repeat",w);
 	}
 }

@@ -10,7 +10,7 @@ import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.SelfRef;
 import com.ourpalm.hot.aactor.actors.TimerActor;
 
-public class DefaultTimerActor implements TimerActor {
+public class SimpleTimerActor implements TimerActor {
 
 	private final Timer timer;
 	@SuppressWarnings("unused")
@@ -18,11 +18,11 @@ public class DefaultTimerActor implements TimerActor {
 	@SuppressWarnings("unused")
 	private ActorSystem system;
 
-	private DefaultTimerActor(String name) {
+	private SimpleTimerActor(String name) {
 		timer = new Timer(name, false);
 	}
 
-	private DefaultTimerActor() {
+	private SimpleTimerActor() {
 		timer = new Timer("System", false);
 	}
 
@@ -33,12 +33,12 @@ public class DefaultTimerActor implements TimerActor {
 	}
 
 	@Override
-	public void timeout(ActorRef act, long delay, String callbackCommand) {
+	public void timeout(ActorRef act, long delay, String callbackCommand,Object ... args) {
 		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				act.sendMessage(callbackCommand);
+				act.sendMessage(callbackCommand,args);
 			}
 		}, delay);
 	}

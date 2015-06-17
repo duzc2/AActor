@@ -7,5 +7,5 @@ import com.ourpalm.hot.aactor.Mailbox;
 @Actor
 public interface TimerActor {
 	@Mailbox
-	public void timeout(ActorRef act, long delay, String callbackCommand);
+	public void timeout(ActorRef act, long delay, String callbackCommand,Object ... args);
 }

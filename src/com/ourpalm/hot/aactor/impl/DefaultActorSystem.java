@@ -127,7 +127,7 @@ public class DefaultActorSystem implements ActorSystem {
 		}
 		synchronized (this) {
 			if (timerActorRef == null) {
-				timerActorRef = createActor(DefaultTimerActor.class);
+				timerActorRef = createActor(SimpleTimerActor.class);
 			}
 		}
 		return timerActorRef.asType(TimerActor.class);
