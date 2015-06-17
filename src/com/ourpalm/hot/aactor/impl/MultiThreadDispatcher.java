@@ -17,14 +17,14 @@ public class MultiThreadDispatcher extends AbstractDispatcher {
 
 	@Override
 	public void sendNormalMessage(SelfRef ar, Object a, String command,
-			Object[] arg) throws Exception {
+			Object[] arg) {
 		queuedMessage.incrementAndGet();
 		excutor.execute(a, () -> ar.call(command, arg));
 	}
 
 	@Override
 	protected void sendPriorMessage(SelfRef ar, Object a, String command,
-			Object[] arg) throws Exception {
+			Object[] arg){
 		queuedMessage.incrementAndGet();
 		excutor.executePreferentially(a, () -> ar.call(command, arg));
 	}

@@ -87,6 +87,7 @@ public abstract class AbstractDispatcher implements MessageDispatcher {
 		this.as = as;
 	}
 
+	@Override
 	public void sendMessage(SelfRef ar, Object a, String command, Object[] arg)
 			throws Exception {
 		if (isPrior(command)) {

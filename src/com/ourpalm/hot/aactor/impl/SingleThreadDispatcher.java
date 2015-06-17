@@ -32,7 +32,7 @@ public class SingleThreadDispatcher extends AbstractDispatcher {
 
 	@Override
 	public void sendNormalMessage(SelfRef ar, Object a, String command,
-			Object[] arg) throws Exception {
+			Object[] arg){
 
 		queuedMessage.incrementAndGet();
 		executor.submit(() -> ar.call(command, arg));
@@ -40,7 +40,7 @@ public class SingleThreadDispatcher extends AbstractDispatcher {
 
 	@Override
 	protected void sendPriorMessage(SelfRef ar, Object a, String command,
-			Object[] arg) throws Exception {
+			Object[] arg){
 		queuedMessage.incrementAndGet();
 		messageDeque.addLast(() -> ar.call(command, arg));
 		executor.submit(() -> {
