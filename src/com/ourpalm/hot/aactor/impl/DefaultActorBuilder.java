@@ -13,7 +13,6 @@ import com.ourpalm.hot.aactor.ActorSystem;
 import com.ourpalm.hot.aactor.Deactivate;
 import com.ourpalm.hot.aactor.config.ActorBuilder;
 import com.ourpalm.hot.aactor.config.messagehandler.Exit;
-import com.ourpalm.hot.aactor.config.messagehandler.Monitor;
 
 /**
  * 
@@ -32,7 +31,6 @@ public class DefaultActorBuilder implements ActorBuilder {
 		LocalSelfRef self = null;
 		try {
 			self = makeSelfRef(root, args);
-			linker.sendMessage(Monitor.COMMAND, self);
 			self.link(linker);
 			initActor(self);
 		} catch (Throwable t) {
